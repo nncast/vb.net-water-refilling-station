@@ -1,0 +1,164 @@
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\bin\Release\MWRS.exe.config
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\bin\Release\MWRS.exe
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\bin\Release\MWRS.pdb
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\bin\Release\MWRS.xml
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.AdminDashboard.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.E2_Sales.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.E3_Orders.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.EmployeeDashboard.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.DlgAddCustomer.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.DlgAdjustCustomerBalance.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.DlgUpdateCustomer.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.DlgEditDelivery.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.DlgUnassignedOrders.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.DlgAddCategories.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.DlgCategories.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.DlgEditCategories.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.DlgAddProduct.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.DlgEditProduct.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.DlgAddServices.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.DlgEditServices.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.DlgServices.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.DlgAddInventoryTransaction.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.DlgEditInventoryTransaction.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.DlgInventoryTransaction.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.DlgAddUnits.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.DlgEditUnits.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.DlgUnits.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.DlgReportFilter.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.DlgAddOrderItem.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.DlgAddServiceItem.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.DlgOrderStatus.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.DlgPayment.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.DlgAddUser.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.DlgUpdateUser.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.Login.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.Resources.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.vbproj.GenerateResource.Cache
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.exe
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.xml
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.pdb
+C:\Users\Janelle Ann\OneDrive\documents\visual studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.vbprojResolveAssemblyReference.cache
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.A3_Orders.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.A6_Customer.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.A5_Delivery.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.A8_Logs.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.A9_Report.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.A7_User.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.A1_Home.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.A4_Inventory.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.A2_Sales.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.E4_Inventory.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.E6_Customer.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.E5_Delivery.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS\MWRS\obj\Release\MWRS.E1_Home.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\bin\Release\MWRS.exe.config
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.exe
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.xml
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.pdb
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.vbprojResolveAssemblyReference.cache
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.AdminDashboard.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.A3_Orders.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.A6_Customer.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.A5_Delivery.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.A8_Logs.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.A9_Report.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.A7_User.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.A1_Home.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.A4_Inventory.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.A2_Sales.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.E2_Sales.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.E3_Orders.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.E4_Inventory.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.E5_Delivery.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.EmployeeDashboard.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.E1_Home.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.E6_Customer.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.DlgAddCustomer.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.DlgAdjustCustomerBalance.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.DlgUpdateCustomer.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.DlgEditDelivery.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.DlgUnassignedOrders.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.DlgAddCategories.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.DlgCategories.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.DlgEditCategories.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.DlgAddProduct.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.DlgEditProduct.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.DlgAddServices.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.DlgEditServices.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.DlgServices.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.DlgAddInventoryTransaction.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.DlgEditInventoryTransaction.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.DlgInventoryTransaction.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.DlgAddUnits.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.DlgEditUnits.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.DlgUnits.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.DlgReportFilter.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.DlgAddOrderItem.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.DlgAddServiceItem.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.DlgOrderStatus.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.DlgPayment.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.DlgAddUser.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.DlgUpdateUser.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.Login.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.Resources.resources
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.vbproj.GenerateResource.Cache
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\bin\Release\MWRS.exe
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\bin\Release\MWRS.pdb
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\bin\Release\MWRS.xml
+C:\Users\Janelle Ann\OneDrive\Documents\Visual Studio 2012\Projects\MWRS - Copy\MWRS\obj\Release\MWRS.DlgAddress.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\bin\Release\MWRS.exe.config
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.exe
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.xml
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.pdb
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\bin\Release\MWRS.exe
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\bin\Release\MWRS.pdb
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\bin\Release\MWRS.xml
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.vbprojResolveAssemblyReference.cache
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.AdminDashboard.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.A3_Orders.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.A6_Customer.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.A5_Delivery.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.A8_Logs.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.A9_Report.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.A7_User.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.A1_Home.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.A4_Inventory.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.A2_Sales.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.E2_Sales.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.E3_Orders.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.E4_Inventory.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.E5_Delivery.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.DlgAddress.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.EmployeeDashboard.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.E1_Home.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.E6_Customer.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.DlgAddCustomer.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.DlgAdjustCustomerBalance.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.DlgUpdateCustomer.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.DlgEditDelivery.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.DlgUnassignedOrders.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.DlgAddCategories.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.DlgCategories.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.DlgEditCategories.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.DlgAddProduct.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.DlgEditProduct.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.DlgAddServices.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.DlgEditServices.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.DlgServices.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.DlgAddInventoryTransaction.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.DlgEditInventoryTransaction.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.DlgInventoryTransaction.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.DlgAddUnits.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.DlgEditUnits.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.DlgUnits.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.DlgReportFilter.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.DlgAddOrderItem.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.DlgAddServiceItem.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.DlgOrderStatus.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.DlgPayment.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.DlgAddUser.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.DlgUpdateUser.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.Login.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.Resources.resources
+C:\Users\Janelle Ann\Downloads\BERNABE, CASTILLO, DE ASIS_SIA_FINALEXAM\MWRS\MWRS\obj\Release\MWRS.vbproj.GenerateResource.Cache

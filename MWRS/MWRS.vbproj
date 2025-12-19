@@ -1,0 +1,605 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7511B3F5-D459-4CD8-8D8F-6761A35D1893}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <StartupObject>MWRS.My.MyApplication</StartupObject>
+    <RootNamespace>MWRS</RootNamespace>
+    <AssemblyName>MWRS</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <MyType>WindowsForms</MyType>
+    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>MWRS.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>MWRS.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionExplicit>On</OptionExplicit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionCompare>Binary</OptionCompare>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionStrict>Off</OptionStrict>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>mwrs.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CrystalDecisions.CrystalReports.Engine, Version=13.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL" />
+    <Reference Include="CrystalDecisions.ReportSource, Version=13.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304" />
+    <Reference Include="CrystalDecisions.Shared, Version=13.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304" />
+    <Reference Include="CrystalDecisions.Windows.Forms, Version=13.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL" />
+    <Reference Include="FlashControlV71, Version=1.0.3187.32366, Culture=neutral, PublicKeyToken=692fbea5521e1304" />
+    <Reference Include="Microsoft.VisualBasic.PowerPacks.Vs, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="MySql.Data, Version=8.0.18.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Downloads\MySql.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="MySql" />
+    <Import Include="MySql.Data" />
+    <Import Include="MySql.Data.Common" />
+    <Import Include="MySql.Data.MySqlClient" />
+    <Import Include="MySql.Data.MySqlClient.Authentication" />
+    <Import Include="MySql.Data.MySqlClient.Interceptors" />
+    <Import Include="MySql.Data.MySqlClient.Memcached" />
+    <Import Include="MySql.Data.MySqlClient.Replication" />
+    <Import Include="MySql.Data.MySqlClient.X" />
+    <Import Include="MySql.Data.MySqlClient.X.XDevAPI" />
+    <Import Include="MySql.Data.MySqlClient.X.XDevAPI.Common" />
+    <Import Include="MySql.Data.Types" />
+    <Import Include="MySqlX" />
+    <Import Include="MySqlX.Protocol" />
+    <Import Include="MySqlX.Serialization" />
+    <Import Include="MySqlX.XDevAPI" />
+    <Import Include="MySqlX.XDevAPI.Common" />
+    <Import Include="MySqlX.XDevAPI.CRUD" />
+    <Import Include="MySqlX.XDevAPI.Relational" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Drawing" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Windows.Forms" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Xml.Linq" />
+    <Import Include="System.Threading.Tasks" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Existing project files -->
+    <Compile Include="Conn.vb" />
+    <Compile Include="Dashboard\Admin\Sections-A\A3 Orders.Designer.vb">
+      <DependentUpon>A3 Orders.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Admin\Sections-A\A3 Orders.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dashboard\Admin\Sections-A\A8 Logs.Designer.vb">
+      <DependentUpon>A8 Logs.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Admin\Sections-A\A8 Logs.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dashboard\Admin\Sections-A\A9 Report.Designer.vb">
+      <DependentUpon>A9 Report.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Admin\Sections-A\A9 Report.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dashboard\Employee\EmployeeDashboard.Designer.vb">
+      <DependentUpon>EmployeeDashboard.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Employee\EmployeeDashboard.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dashboard\Employee\Sections-E\E2 Sales.Designer.vb">
+      <DependentUpon>E2 Sales.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Employee\Sections-E\E2 Sales.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dashboard\Employee\Sections-E\E3 Orders.Designer.vb">
+      <DependentUpon>E3 Orders.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Employee\Sections-E\E3 Orders.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dashboard\Employee\Sections-E\E4 Inventory.Designer.vb">
+      <DependentUpon>E4 Inventory.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Employee\Sections-E\E4 Inventory.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dashboard\Employee\Sections-E\E6 Customers.Designer.vb">
+      <DependentUpon>E6 Customers.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Employee\Sections-E\E6 Customers.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dashboard\Employee\Sections-E\E1 Home.Designer.vb">
+      <DependentUpon>E1 Home.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Employee\Sections-E\E1 Home.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dashboard\Employee\Sections-E\E5 Delivery.Designer.vb">
+      <DependentUpon>E5 Delivery.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Employee\Sections-E\E5 Delivery.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Customer\DlgAddCustomer.Designer.vb">
+      <DependentUpon>DlgAddCustomer.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Customer\DlgAddCustomer.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Customer\Address\DlgAddress.Designer.vb">
+      <DependentUpon>DlgAddress.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Customer\Address\DlgAddress.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Customer\DlgAdjustCustomerBalance.Designer.vb">
+      <DependentUpon>DlgAdjustCustomerBalance.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Customer\DlgAdjustCustomerBalance.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Customer\DlgUpdateCustomer.Designer.vb">
+      <DependentUpon>DlgUpdateCustomer.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Customer\DlgUpdateCustomer.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Delivery\DlgEditDelivery.Designer.vb">
+      <DependentUpon>DlgEditDelivery.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Delivery\DlgEditDelivery.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Delivery\DlgUnassignedOrders.Designer.vb">
+      <DependentUpon>DlgUnassignedOrders.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Delivery\DlgUnassignedOrders.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Inventory\Categories\DlgAddCategories.Designer.vb">
+      <DependentUpon>DlgAddCategories.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Inventory\Categories\DlgAddCategories.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Inventory\Categories\DlgCategories.Designer.vb">
+      <DependentUpon>DlgCategories.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Inventory\Categories\DlgCategories.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Inventory\Categories\DlgEditCategories.Designer.vb">
+      <DependentUpon>DlgEditCategories.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Inventory\Categories\DlgEditCategories.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Inventory\DlgAddProduct.Designer.vb">
+      <DependentUpon>DlgAddProduct.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Inventory\DlgAddProduct.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Inventory\DlgEditProduct.Designer.vb">
+      <DependentUpon>DlgEditProduct.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Inventory\DlgEditProduct.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Inventory\Services\DlgAddServices.Designer.vb">
+      <DependentUpon>DlgAddServices.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Inventory\Services\DlgAddServices.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Inventory\Services\DlgEditServices.Designer.vb">
+      <DependentUpon>DlgEditServices.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Inventory\Services\DlgEditServices.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Inventory\Services\DlgServices.Designer.vb">
+      <DependentUpon>DlgServices.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Inventory\Services\DlgServices.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Inventory\Transactions\DlgAddInventoryTransaction.Designer.vb">
+      <DependentUpon>DlgAddInventoryTransaction.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Inventory\Transactions\DlgAddInventoryTransaction.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Inventory\Transactions\DlgEditInventoryTransaction.Designer.vb">
+      <DependentUpon>DlgEditInventoryTransaction.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Inventory\Transactions\DlgEditInventoryTransaction.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Inventory\Transactions\DlgInventoryTransaction.Designer.vb">
+      <DependentUpon>DlgInventoryTransaction.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Inventory\Transactions\DlgInventoryTransaction.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Inventory\Units\DlgAddUnits.Designer.vb">
+      <DependentUpon>DlgAddUnits.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Inventory\Units\DlgAddUnits.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Inventory\Units\DlgEditUnits.Designer.vb">
+      <DependentUpon>DlgEditUnits.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Inventory\Units\DlgEditUnits.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Inventory\Units\DlgUnits.Designer.vb">
+      <DependentUpon>DlgUnits.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Inventory\Units\DlgUnits.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Report\DlgReportFilter.Designer.vb">
+      <DependentUpon>DlgReportFilter.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Report\DlgReportFilter.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Sales\DlgAddOrderItem.Designer.vb">
+      <DependentUpon>DlgAddOrderItem.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Sales\DlgAddOrderItem.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Sales\DlgAddServiceItem.Designer.vb">
+      <DependentUpon>DlgAddServiceItem.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Sales\DlgAddServiceItem.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Sales\DlgOrderStatus.Designer.vb">
+      <DependentUpon>DlgOrderStatus.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Sales\DlgOrderStatus.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Sales\DlgPayment.Designer.vb">
+      <DependentUpon>DlgPayment.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Sales\DlgPayment.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\User\DlgAddUser.Designer.vb">
+      <DependentUpon>DlgAddUser.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\User\DlgAddUser.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\User\DlgUpdateUser.Designer.vb">
+      <DependentUpon>DlgUpdateUser.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\User\DlgUpdateUser.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Globals.vb" />
+    <Compile Include="Login.Designer.vb">
+      <DependentUpon>Login.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Login.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <!-- Admin Dashboard -->
+    <Compile Include="Dashboard\Admin\Sections-A\AdminDashboard.Designer.vb">
+      <DependentUpon>AdminDashboard.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Admin\Sections-A\AdminDashboard.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ReportDocument\RPTInventory.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RPTInventory.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ReportDocument\RPTSales.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RPTSales.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <EmbeddedResource Include="Dashboard\Admin\Sections-A\AdminDashboard.resx">
+      <DependentUpon>AdminDashboard.vb</DependentUpon>
+    </EmbeddedResource>
+    <!-- Customers-A -->
+    <Compile Include="Dashboard\Admin\Sections-A\A6 Customers.Designer.vb">
+      <DependentUpon>A6 Customers.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Admin\Sections-A\A6 Customers.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <EmbeddedResource Include="Dashboard\Admin\Sections-A\A3 Orders.resx">
+      <DependentUpon>A3 Orders.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dashboard\Admin\Sections-A\A6 Customers.resx">
+      <DependentUpon>A6 Customers.vb</DependentUpon>
+    </EmbeddedResource>
+    <!-- Delivery-A -->
+    <Compile Include="Dashboard\Admin\Sections-A\A5 Delivery.Designer.vb">
+      <DependentUpon>A5 Delivery.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Admin\Sections-A\A5 Delivery.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <EmbeddedResource Include="Dashboard\Admin\Sections-A\A5 Delivery.resx">
+      <DependentUpon>A5 Delivery.vb</DependentUpon>
+    </EmbeddedResource>
+    <!-- Employees-A -->
+    <Compile Include="Dashboard\Admin\Sections-A\A7 User.Designer.vb">
+      <DependentUpon>A7 User.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Admin\Sections-A\A7 User.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <EmbeddedResource Include="Dashboard\Admin\Sections-A\A8 Logs.resx">
+      <DependentUpon>A8 Logs.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dashboard\Admin\Sections-A\A9 Report.resx">
+      <DependentUpon>A9 Report.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dashboard\Admin\Sections-A\A7 User.resx">
+      <DependentUpon>A7 User.vb</DependentUpon>
+    </EmbeddedResource>
+    <!-- Home-A -->
+    <Compile Include="Dashboard\Admin\Sections-A\A1 Home.Designer.vb">
+      <DependentUpon>A1 Home.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Admin\Sections-A\A1 Home.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <EmbeddedResource Include="Dashboard\Admin\Sections-A\A1 Home.resx">
+      <DependentUpon>A1 Home.vb</DependentUpon>
+    </EmbeddedResource>
+    <!-- Inventory-A -->
+    <Compile Include="Dashboard\Admin\Sections-A\A4 Inventory.Designer.vb">
+      <DependentUpon>A4 Inventory.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Admin\Sections-A\A4 Inventory.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <EmbeddedResource Include="Dashboard\Admin\Sections-A\A4 Inventory.resx">
+      <DependentUpon>A4 Inventory.vb</DependentUpon>
+    </EmbeddedResource>
+    <!-- Sales-A -->
+    <Compile Include="Dashboard\Admin\Sections-A\A2 Sales.Designer.vb">
+      <DependentUpon>A2 Sales.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\Admin\Sections-A\A2 Sales.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <EmbeddedResource Include="Dashboard\Admin\Sections-A\A2 Sales.resx">
+      <DependentUpon>A2 Sales.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dashboard\Employee\Sections-E\E2 Sales.resx">
+      <DependentUpon>E2 Sales.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dashboard\Employee\Sections-E\E3 Orders.resx">
+      <DependentUpon>E3 Orders.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dashboard\Employee\Sections-E\E4 Inventory.resx">
+      <DependentUpon>E4 Inventory.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dashboard\Employee\Sections-E\E5 Delivery.resx">
+      <DependentUpon>E5 Delivery.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Customer\Address\DlgAddress.resx">
+      <DependentUpon>DlgAddress.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ReportDocument\RPTInventory.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RPTInventory.vb</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ReportDocument\RPTSales.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RPTSales.vb</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Dashboard\Employee\EmployeeDashboard.resx">
+      <DependentUpon>EmployeeDashboard.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dashboard\Employee\Sections-E\E1 Home.resx">
+      <DependentUpon>E1 Home.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dashboard\Employee\Sections-E\E6 Customers.resx">
+      <DependentUpon>E6 Customers.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Customer\DlgAddCustomer.resx">
+      <DependentUpon>DlgAddCustomer.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Customer\DlgAdjustCustomerBalance.resx">
+      <DependentUpon>DlgAdjustCustomerBalance.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Customer\DlgUpdateCustomer.resx">
+      <DependentUpon>DlgUpdateCustomer.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Delivery\DlgEditDelivery.resx">
+      <DependentUpon>DlgEditDelivery.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Delivery\DlgUnassignedOrders.resx">
+      <DependentUpon>DlgUnassignedOrders.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Inventory\Categories\DlgAddCategories.resx">
+      <DependentUpon>DlgAddCategories.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Inventory\Categories\DlgCategories.resx">
+      <DependentUpon>DlgCategories.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Inventory\Categories\DlgEditCategories.resx">
+      <DependentUpon>DlgEditCategories.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Inventory\DlgAddProduct.resx">
+      <DependentUpon>DlgAddProduct.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Inventory\DlgEditProduct.resx">
+      <DependentUpon>DlgEditProduct.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Inventory\Services\DlgAddServices.resx">
+      <DependentUpon>DlgAddServices.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Inventory\Services\DlgEditServices.resx">
+      <DependentUpon>DlgEditServices.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Inventory\Services\DlgServices.resx">
+      <DependentUpon>DlgServices.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Inventory\Transactions\DlgAddInventoryTransaction.resx">
+      <DependentUpon>DlgAddInventoryTransaction.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Inventory\Transactions\DlgEditInventoryTransaction.resx">
+      <DependentUpon>DlgEditInventoryTransaction.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Inventory\Transactions\DlgInventoryTransaction.resx">
+      <DependentUpon>DlgInventoryTransaction.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Inventory\Units\DlgAddUnits.resx">
+      <DependentUpon>DlgAddUnits.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Inventory\Units\DlgEditUnits.resx">
+      <DependentUpon>DlgEditUnits.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Inventory\Units\DlgUnits.resx">
+      <DependentUpon>DlgUnits.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Report\DlgReportFilter.resx">
+      <DependentUpon>DlgReportFilter.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Sales\DlgAddOrderItem.resx">
+      <DependentUpon>DlgAddOrderItem.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Sales\DlgAddServiceItem.resx">
+      <DependentUpon>DlgAddServiceItem.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Sales\DlgOrderStatus.resx">
+      <DependentUpon>DlgOrderStatus.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Sales\DlgPayment.resx">
+      <DependentUpon>DlgPayment.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\User\DlgAddUser.resx">
+      <DependentUpon>DlgAddUser.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\User\DlgUpdateUser.resx">
+      <DependentUpon>DlgUpdateUser.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Login.resx">
+      <DependentUpon>Login.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\eyehide.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\mwrs.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\eyeshow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{C0C07587-41A7-46C8-8FBD-3F9C8EBE2DDC}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="mwrs.ico" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

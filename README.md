@@ -21,9 +21,7 @@
 **Monitoring System: A Desktop-Based Application for Mangalos Water Refilling Station** is a desktop-based **VB.NET** application designed to automate and monitor daily operations of a water refilling business.
 The system centralizes **sales, inventory, customer debts, and delivery records**, replacing manual logs and spreadsheets with a structured digital solution.
 
-> **Current version: v0.1.0** — first tagged release. See [Releases](https://github.com/nncast/vb.net-water-refilling-station/releases) for the project timeline.
-
-## Screenshots
+> **Current version: v0.1.0** — first tagged release. See [Releases](https://github.com/nncast/vb.net-water-refilling-station/releases) for the release notes.
 
 <p align="center">
   <img width="400" alt="image" src="https://github.com/user-attachments/assets/3bd57d10-0d6a-400b-9f2b-f991b359c5dc" />
@@ -93,12 +91,6 @@ The system centralizes **sales, inventory, customer debts, and delivery records*
 6. Build and run the application.
 
 Sign in with `admin` / `admin`.
-
-## Developers
-
-- Kimberly S. Bernabe
-- Janelle Ann F. Castillo
-- Romar D. De Asis
 
 ---
 

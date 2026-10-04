@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="MWRS/Resources/mwrs.png" alt="Mangalos Water Refilling Station logo" width="200"/>
+  <img src="MWRS/Resources/mwrs.png" alt="Mangalos Water Refilling Station logo" width="100"/>
 </p>
 
 <p align="center">

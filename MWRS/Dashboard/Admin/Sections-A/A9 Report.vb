@@ -1,4 +1,5 @@
-﻿Imports CrystalDecisions.CrystalReports.Engine
+﻿Imports System.Configuration
+Imports CrystalDecisions.CrystalReports.Engine
 Imports CrystalDecisions.Shared
 
 Public Class A9_Report
@@ -30,12 +31,19 @@ Public Class A9_Report
 
     Private Sub LoadReport(report As ReportDocument)
         Try
+            ' Database, user and password come from the MwrsDb connection string in
+            ' MWRS.exe.config (the same one the rest of the app uses); the data
+            ' source the reports were designed with is the ReportServer setting.
+            Dim db As New MySqlConnectionStringBuilder(ConfigurationManager.ConnectionStrings("MwrsDb").ConnectionString)
+            Dim server As String = ConfigurationManager.AppSettings("ReportServer")
+            If String.IsNullOrWhiteSpace(server) Then server = "POSMWRS"
+
             For Each table As Table In report.Database.Tables
                 Dim logonInfo As TableLogOnInfo = table.LogOnInfo
-                logonInfo.ConnectionInfo.ServerName = "POSMWRS"
-                logonInfo.ConnectionInfo.DatabaseName = "dbmwrs"
-                logonInfo.ConnectionInfo.UserID = "root"
-                logonInfo.ConnectionInfo.Password = ""
+                logonInfo.ConnectionInfo.ServerName = server
+                logonInfo.ConnectionInfo.DatabaseName = db.Database
+                logonInfo.ConnectionInfo.UserID = db.UserID
+                logonInfo.ConnectionInfo.Password = db.Password
                 table.ApplyLogOnInfo(logonInfo)
             Next
 

@@ -19,7 +19,7 @@ Public Class DlgReportFilter
             cbPeriodType.SelectedIndex = 0
 
             ' --- Populate Customer ComboBox ---
-            GetQuery("SELECT custid, CONCAT(fname,' ',lname) AS fullname FROM tblcustomers ORDER BY fname", "customers")
+            GetQuery("SELECT custid, fullname FROM tblcustomers ORDER BY fullname", "customers")
             Dim dtCustomers As DataTable = ds.Tables("customers").Copy()
             cbCustomer.DataSource = dtCustomers
             cbCustomer.DisplayMember = "fullname"

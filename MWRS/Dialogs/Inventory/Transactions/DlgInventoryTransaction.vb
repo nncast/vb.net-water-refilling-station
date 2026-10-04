@@ -15,16 +15,12 @@
             "INNER JOIN tblusers u ON t.userid = u.userid"
 
         If keyword <> "" Then
-            sql &= " WHERE p.name LIKE '%" & keyword.Replace("'", "''") & "%' " &
-                   "OR CONCAT(u.fname, ' ', u.lname) LIKE '%" & keyword.Replace("'", "''") & "%' " &
-                   "OR t.transtype LIKE '%" & keyword.Replace("'", "''") & "%' " &
-                   "OR t.remarks LIKE '%" & keyword.Replace("'", "''") & "%'"
+            sql &= " WHERE p.name LIKE @k OR CONCAT(u.fname, ' ', u.lname) LIKE @k OR t.transtype LIKE @k OR t.remarks LIKE @k"
         End If
 
         sql &= " ORDER BY t.transdate DESC, t.transid DESC"
 
-        ds.Tables.Clear()
-        GetQuery(sql, "tblinventorytransactions")
+        GetQuery(sql, "tblinventorytransactions", P("@k", "%" & keyword & "%"))
 
         If ds.Tables("tblinventorytransactions").Rows.Count = 0 Then Exit Sub
 
@@ -61,6 +57,11 @@
 
         Dim transId As Integer = CInt(lvtransactions.SelectedItems(0).Text)
 
+        If IsOrderTransaction(lvtransactions.SelectedItems(0).SubItems(6).Text) Then
+            MsgBox("This stock movement was made by an order. Change or cancel the order instead.", MsgBoxStyle.Exclamation, "Order Transaction")
+            Exit Sub
+        End If
+
         Dim dlg As New DlgEditInventoryTransaction()
         dlg.TransactionId = transId
 
@@ -88,36 +89,45 @@
         Dim transId As Integer = CInt(lvtransactions.SelectedItems(0).Text)
 
         If MsgBox("Are you sure you want to delete this transaction?", MsgBoxStyle.YesNo + MsgBoxStyle.Question) = MsgBoxResult.Yes Then
-            ' Optional: Capture details before deletion for logging
-            If ds.Tables.Contains("tbltransdel") Then ds.Tables("tbltransdel").Clear()
-            GetQuery("SELECT productid, transtype, qty FROM tblinventorytransactions WHERE transid = " & transId, "tbltransdel")
+            Try
+                BeginTransaction()
 
-            Dim productId As Integer = 0
-            Dim transtype As String = ""
-            Dim qty As Integer = 0
+                GetQuery("SELECT t.productid, t.transtype, t.qty, t.remarks, p.stockqty FROM tblinventorytransactions t " &
+                         "JOIN tblproducts p ON p.productid = t.productid WHERE t.transid = @t FOR UPDATE", "tbltransdel", P("@t", transId))
+                If ds.Tables("tbltransdel").Rows.Count = 0 Then Throw New ApplicationException("Transaction not found.")
 
-            If ds.Tables("tbltransdel").Rows.Count > 0 Then
-                productId = CInt(ds.Tables("tbltransdel").Rows(0)("productid"))
-                transtype = ds.Tables("tbltransdel").Rows(0)("transtype").ToString()
-                qty = CInt(ds.Tables("tbltransdel").Rows(0)("qty"))
-            End If
+                Dim row As DataRow = ds.Tables("tbltransdel").Rows(0)
+                Dim productId As Integer = CInt(row("productid"))
+                Dim transtype As String = row("transtype").ToString()
+                Dim qty As Integer = CInt(row("qty"))
 
-            If transtype = "Stock In" Then
-                ' Remove the stock added
-                SetQuery("UPDATE tblproducts SET stockqty = stockqty - " & qty & " WHERE productid = " & productId)
-            ElseIf transtype = "Stock Out" Then
-                ' Restore the stock removed
-                SetQuery("UPDATE tblproducts SET stockqty = stockqty + " & qty & " WHERE productid = " & productId)
-            End If
+                If IsOrderTransaction(row("remarks").ToString()) Then
+                    Throw New ApplicationException("This stock movement was made by an order. Change or cancel the order instead.")
+                End If
 
+                ' Deleting a stock-in takes its quantity back out of stock.
+                If transtype = "Stock In" AndAlso CInt(row("stockqty")) < qty Then
+                    Throw New ApplicationException("Only " & row("stockqty").ToString() & " of these " & qty & " units are still in stock, so this stock-in can't be deleted.")
+                End If
 
-            ' Delete the transaction
-            Dim sql As String = "DELETE FROM tblinventorytransactions WHERE transid = " & transId
-            SetQuery(sql)
+                If transtype = "Stock In" Then
+                    ' Remove the stock added
+                    Execute("UPDATE tblproducts SET stockqty = stockqty - @q WHERE productid = @p", P("@q", qty), P("@p", productId))
+                ElseIf transtype = "Stock Out" Then
+                    ' Restore the stock removed
+                    Execute("UPDATE tblproducts SET stockqty = stockqty + @q WHERE productid = @p", P("@q", qty), P("@p", productId))
+                End If
 
-            ' --- Log deletion ---
-            LogActivity("Inventory", "Deleted transaction ID " & transId & _
-                        " - " & transtype & " of " & qty & " units for product ID " & productId, transId)
+                ' Delete the transaction
+                Execute("DELETE FROM tblinventorytransactions WHERE transid = @t", P("@t", transId))
+
+                ' --- Log deletion ---
+                LogActivity("Inventory", "Deleted " & transtype & " of " & qty, transId)
+                CommitTransaction()
+            Catch ex As Exception
+                RollbackTransaction()
+                MsgBox("Could not delete the transaction: " & ex.Message, MsgBoxStyle.Exclamation)
+            End Try
 
             ' Refresh
             A4_Inventory.fill()

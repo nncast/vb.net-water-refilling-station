@@ -24,16 +24,12 @@
             "LEFT JOIN tblproductunit u ON p.unitid = u.unitid"
 
         If keyword <> "" Then
-            sql &= " WHERE p.name LIKE '%" & keyword & "%' " &
-                   "OR c.name LIKE '%" & keyword & "%' " &
-                   "OR u.unittype LIKE '%" & keyword & "%' " &
-                   "OR p.status LIKE '%" & keyword & "%'"
+            sql &= " WHERE p.name LIKE @k OR c.name LIKE @k OR u.unittype LIKE @k OR p.status LIKE @k"
         End If
 
         sql &= " ORDER BY p.name"
 
-        ds.Tables.Clear()
-        GetQuery(sql, "tblproducts")
+        GetQuery(sql, "tblproducts", P("@k", "%" & keyword & "%"))
 
         If ds.Tables("tblproducts").Rows.Count = 0 Then Exit Sub
 

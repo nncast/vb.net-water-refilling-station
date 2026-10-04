@@ -2,8 +2,7 @@
     Public Property SelectedCategoryID As Integer
 
     Private Sub DlgEditCategories_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Dim sql As String = "SELECT * FROM tblproductcategories WHERE categoryid = " & SelectedCategoryID
-        GetQuery(sql, "tblproductcategories")
+        GetQuery("SELECT * FROM tblproductcategories WHERE categoryid = @c", "tblproductcategories", P("@c", SelectedCategoryID))
 
         If ds.Tables("tblproductcategories").Rows.Count > 0 Then
             txtcategoryname.Text = ds.Tables("tblproductcategories").Rows(0)("name").ToString()
@@ -17,17 +16,18 @@
             Exit Sub
         End If
 
-        ' Check if new name already exists (except for current one)
-        Dim checkSql As String = "SELECT * FROM tblproductcategories WHERE name = '" & newName.Replace("'", "''") & "' AND categoryid <> " & SelectedCategoryID
-        GetQuery(checkSql, "checkDup")
+        If newName.Length > 50 Then
+            MsgBox("Category name can be at most 50 characters.", MsgBoxStyle.Exclamation)
+            Exit Sub
+        End If
 
-        If ds.Tables("checkDup").Rows.Count > 0 Then
+        ' Check if new name already exists (except for current one)
+        If CInt(GetValue("SELECT COUNT(*) FROM tblproductcategories WHERE name = @n AND categoryid <> @c", P("@n", newName), P("@c", SelectedCategoryID))) > 0 Then
             MsgBox("Category name already exists.", MsgBoxStyle.Exclamation)
             Exit Sub
         End If
 
-        Dim sql As String = "UPDATE tblproductcategories SET name = '" & newName.Replace("'", "''") & "' WHERE categoryid = " & SelectedCategoryID
-        SetQuery(sql)
+        If Not SetQuery("UPDATE tblproductcategories SET name = @n WHERE categoryid = @c", P("@n", newName), P("@c", SelectedCategoryID)) Then Exit Sub
         MsgBox("Category updated successfully.", MsgBoxStyle.Information)
 
         LogActivity("Categories", "Update Category", SelectedCategoryID)

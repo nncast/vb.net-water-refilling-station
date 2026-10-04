@@ -36,16 +36,12 @@
             "LEFT JOIN tblproductunit u ON p.unitid = u.unitid"
 
         If keyword <> "" Then
-            sql &= " WHERE p.name LIKE '%" & keyword & "%' " &
-                   "OR c.name LIKE '%" & keyword & "%' " &
-                   "OR u.unittype LIKE '%" & keyword & "%' " &
-                   "OR p.status LIKE '%" & keyword & "%'"
+            sql &= " WHERE p.name LIKE @k OR c.name LIKE @k OR u.unittype LIKE @k OR p.status LIKE @k"
         End If
 
         sql &= " ORDER BY p.name"
 
-        ds.Tables.Clear()
-        GetQuery(sql, "tblproducts")
+        GetQuery(sql, "tblproducts", P("@k", "%" & keyword & "%"))
 
         If ds.Tables("tblproducts").Rows.Count = 0 Then Exit Sub
 
@@ -121,12 +117,12 @@
         ' --- Check if product is used elsewhere ---
         Dim checkSql As String =
             "SELECT COUNT(*) AS refcount FROM (" &
-            " SELECT productid FROM tblinventorytransactions WHERE productid = " & productId &
+            " SELECT productid FROM tblinventorytransactions WHERE productid = @p" &
             " UNION ALL " &
-            " SELECT productid FROM tblorderitems WHERE productid = " & productId &
+            " SELECT productid FROM tblorderitems WHERE productid = @p" &
             " ) AS refs"
 
-        GetQuery(checkSql, "refCheck")
+        GetQuery(checkSql, "refCheck", P("@p", productId))
         Dim refCount As Integer = 0
         If ds.Tables("refCheck").Rows.Count > 0 Then
             refCount = CInt(ds.Tables("refCheck").Rows(0)("refcount"))
@@ -135,8 +131,7 @@
         ' --- No references → safe to delete ---
         If refCount = 0 Then
             If MsgBox("Are you sure you want to permanently delete this product?", MsgBoxStyle.YesNo + MsgBoxStyle.Question) = MsgBoxResult.Yes Then
-                Dim deleteSql As String = "DELETE FROM tblproducts WHERE productid = " & productId
-                SetQuery(deleteSql)
+                If Not SetQuery("DELETE FROM tblproducts WHERE productid = @p", P("@p", productId)) Then Exit Sub
                 LogActivity("Products", "Delete product", productId)
                 MsgBox("Product deleted successfully.", MsgBoxStyle.Information)
                 Fill()
@@ -151,8 +146,7 @@
             MsgBoxStyle.YesNo + MsgBoxStyle.Exclamation, "Cannot Delete")
 
         If result = MsgBoxResult.Yes Then
-            Dim updateSql As String = "UPDATE tblproducts SET status = 'Inactive' WHERE productid = " & productId
-            SetQuery(updateSql)
+            If Not SetQuery("UPDATE tblproducts SET status = 'Inactive' WHERE productid = @p", P("@p", productId)) Then Exit Sub
             LogActivity("Products", "Set Inactive", productId)
             MsgBox("Product status set to Inactive.", MsgBoxStyle.Information)
             Fill()

@@ -350,7 +350,7 @@ CREATE TABLE `tblusers` (
 
 /*Data for the table `tblusers` */
 
-insert  into `tblusers`(`userid`,`fname`,`lname`,`username`,`password`,`role`,`status`) values (1,'Admin','Admin','admin','admin','Admin','Active');
+insert  into `tblusers`(`userid`,`fname`,`lname`,`username`,`password`,`role`,`status`) values (1,'Admin','Admin','admin','PBKDF2$100000$7xGME57O/PslB4O9JPh0ag==$v/tRxY3/CcsMrRSgTfWvQdkYrZf+a0uKGiYnIzzn1a4=','Admin','Active');
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

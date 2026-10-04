@@ -18,12 +18,9 @@
     "SELECT c.fullname, b.balance " &
     "FROM tblcustomers c " &
     "LEFT JOIN tblcustomerbalance b ON c.custid = b.custid " &
-    "WHERE c.custid = " & SelectedCustID
+    "WHERE c.custid = @c"
 
-
-
-            ds.Tables.Clear()
-            GetQuery(sql, "customerinfo")
+            GetQuery(sql, "customerinfo", P("@c", SelectedCustID))
 
             If ds.Tables("customerinfo").Rows.Count = 0 Then
                 MsgBox("Customer record not found.", MsgBoxStyle.Critical, "Error")
@@ -34,7 +31,8 @@
             Dim row As DataRow = ds.Tables("customerinfo").Rows(0)
             lblcust.Text = row("fullname").ToString()
 
-            currentBalance = CDec(row("balance"))
+            ' A customer without a balance row yet has nothing owing.
+            currentBalance = If(IsDBNull(row("balance")), 0D, CDec(row("balance")))
             txtcustbalance.Text = Format(currentBalance, "0.00")
 
         Catch ex As Exception
@@ -56,12 +54,12 @@
             ' Optional: add confirmation
             If MsgBox("Update customer balance?", MsgBoxStyle.Question + MsgBoxStyle.YesNo) = MsgBoxResult.No Then Exit Sub
 
-            ' Update balance
+            ' Update balance (creates the balance row if the customer has none yet)
             Dim sql As String =
-                "UPDATE tblcustomerbalance SET balance = " & newBalance & ", lastupdate = NOW() " &
-                "WHERE custid = " & SelectedCustID
+                "INSERT INTO tblcustomerbalance (custid, balance) VALUES (@c, @b) " &
+                "ON DUPLICATE KEY UPDATE balance = @b, lastupdate = NOW()"
 
-            SetQuery(sql)
+            If Not SetQuery(sql, P("@c", SelectedCustID), P("@b", newBalance)) Then Exit Sub
             LogActivity("Customer", "Adjusted balance to: " & newBalance, SelectedCustID)
             MsgBox("Customer balance updated successfully.", MsgBoxStyle.Information)
 

@@ -8,14 +8,23 @@
     End Sub
 
     Private Sub btnsave_Click(sender As Object, e As EventArgs) Handles btnsave.Click
+        Dim name As String = txtservicename.Text.Trim()
+        Dim price As Decimal
+
         ' --- Validation ---
-        If String.IsNullOrWhiteSpace(txtservicename.Text) Then
+        If name = "" Then
             MsgBox("Service name is required.", MsgBoxStyle.Exclamation)
             txtservicename.Focus()
             Exit Sub
         End If
 
-        If String.IsNullOrWhiteSpace(txtprice.Text) OrElse Not IsNumeric(txtprice.Text) Then
+        If name.Length > 100 Then
+            MsgBox("Service name can be at most 100 characters.", MsgBoxStyle.Exclamation)
+            txtservicename.Focus()
+            Exit Sub
+        End If
+
+        If Not Decimal.TryParse(txtprice.Text.Trim(), price) OrElse price < 0 Then
             MsgBox("Enter a valid numeric price.", MsgBoxStyle.Exclamation)
             txtprice.Focus()
             Exit Sub
@@ -27,27 +36,21 @@
             Exit Sub
         End If
 
-        ' --- Build Insert Query ---
-        Dim sql As String =
-            "INSERT INTO tblservices (name, price, status) VALUES (" &
-            "'" & txtservicename.Text.Trim().Replace("'", "''") & "', " &
-            Convert.ToDecimal(txtprice.Text).ToString("F2") & ", " &
-            "'" & cmbstatus.SelectedItem.ToString() & "')"
+        If CInt(GetValue("SELECT COUNT(*) FROM tblservices WHERE name = @n", P("@n", name))) > 0 Then
+            MsgBox("A service with this name already exists.", MsgBoxStyle.Exclamation)
+            txtservicename.Focus()
+            Exit Sub
+        End If
 
         ' --- Execute ---
-        Try
-            SetQuery(sql)
-            MsgBox("Service added successfully.", MsgBoxStyle.Information)
+        If Not SetQuery("INSERT INTO tblservices (name, price, status) VALUES (@n, @p, @s)",
+                        P("@n", name), P("@p", price), P("@s", cmbstatus.SelectedItem.ToString())) Then Exit Sub
 
-            ' Optional: Log activity
-            LogActivity("Services", "Added new service: " & txtservicename.Text, GetLastInsertedID())
+        LogActivity("Services", "Added new service: " & name, GetLastInsertedID())
+        MsgBox("Service added successfully.", MsgBoxStyle.Information)
 
-            Me.DialogResult = DialogResult.OK
-            Me.Close()
-
-        Catch ex As Exception
-            MsgBox("Error saving service: " & ex.Message, MsgBoxStyle.Critical)
-        End Try
+        Me.DialogResult = DialogResult.OK
+        Me.Close()
     End Sub
 
     Private Sub btncancel_Click(sender As Object, e As EventArgs) Handles btncancel.Click

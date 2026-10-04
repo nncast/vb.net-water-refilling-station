@@ -60,27 +60,29 @@ Public Class A1_Home
         series.Color = Color.DodgerBlue
 
         Dim query As String = ""
+        ' Cancelled orders keep their sale row; leave them out of the totals.
+        Const NotCancelled As String = "AND orderid NOT IN (SELECT orderid FROM tblorders WHERE status = 'Cancelled') "
 
         ' Build query based on selected period
         Select Case period
             Case "Daily"
                 query = "SELECT DATE(saledate) as period, SUM(totalamount) as total " &
                         "FROM tblsales " &
-                        "WHERE saledate >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) " &
+                        "WHERE saledate >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) " & NotCancelled &
                         "GROUP BY DATE(saledate) " &
                         "ORDER BY DATE(saledate)"
 
             Case "Monthly"
                 query = "SELECT DATE_FORMAT(saledate, '%Y-%m') as period, SUM(totalamount) as total " &
                         "FROM tblsales " &
-                        "WHERE saledate >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH) " &
+                        "WHERE saledate >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH) " & NotCancelled &
                         "GROUP BY DATE_FORMAT(saledate, '%Y-%m') " &
                         "ORDER BY DATE_FORMAT(saledate, '%Y-%m')"
 
             Case "Yearly"
                 query = "SELECT YEAR(saledate) as period, SUM(totalamount) as total " &
                         "FROM tblsales " &
-                        "WHERE saledate >= DATE_SUB(CURDATE(), INTERVAL 5 YEAR) " &
+                        "WHERE saledate >= DATE_SUB(CURDATE(), INTERVAL 5 YEAR) " & NotCancelled &
                         "GROUP BY YEAR(saledate) " &
                         "ORDER BY YEAR(saledate)"
         End Select
@@ -193,7 +195,8 @@ Public Class A1_Home
 
     Public Sub LoadDashboardData()
         ' --- Total Sales (Today) ---
-        GetQuery("SELECT IFNULL(SUM(totalamount),0) AS totalsales FROM tblsales WHERE DATE(saledate)=CURDATE()", "salesToday")
+        GetQuery("SELECT IFNULL(SUM(s.totalamount),0) AS totalsales FROM tblsales s JOIN tblorders o ON o.orderid = s.orderid " &
+                 "WHERE DATE(s.saledate)=CURDATE() AND o.status <> 'Cancelled'", "salesToday")
         lblsalestoday.Text = "₱" & Format(CDec(ds.Tables("salesToday").Rows(0)("totalsales")), "0.00")
 
         ' --- Unpaid Orders ---
@@ -202,7 +205,8 @@ Public Class A1_Home
             "FROM tblsales s " &
             "LEFT JOIN (SELECT saleid, SUM(amountpaid) AS totalpaid FROM tblpayments GROUP BY saleid) p " &
             "ON s.saleid = p.saleid " &
-            "WHERE s.paymentstatus IN ('Unpaid','Partial')"
+            "JOIN tblorders o ON o.orderid = s.orderid " &
+            "WHERE s.paymentstatus IN ('Unpaid','Partial') AND o.status <> 'Cancelled'"
         GetQuery(sqlUnpaid, "unpaidTotal")
         lblunpaidorders.Text = "₱" & Format(CDec(ds.Tables("unpaidTotal").Rows(0)("unpaidtotal")), "0.00")
 

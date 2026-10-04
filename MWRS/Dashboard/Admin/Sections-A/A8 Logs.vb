@@ -20,23 +20,25 @@
                                 "INNER JOIN tblusers u ON a.userid = u.userid WHERE 1=1 "
 
             If userId <> 0 Then
-                sql &= " AND u.userid = " & userId
+                sql &= " AND u.userid = @uid"
             End If
 
+            ' Whole days: from the start of the first day up to (not including) the day after the last.
             If fromDate.HasValue Then
-                sql &= " AND a.timestamp >= '" & fromDate.Value.ToString("yyyy-MM-dd 00:00:00") & "' "
+                sql &= " AND a.timestamp >= @from"
             End If
             If toDate.HasValue Then
-                sql &= " AND a.timestamp <= '" & toDate.Value.ToString("yyyy-MM-dd 23:59:59") & "' "
+                sql &= " AND a.timestamp < @to"
             End If
 
             If Not String.IsNullOrWhiteSpace(searchText) Then
-                sql &= " AND (a.module LIKE '%" & searchText.Replace("'", "''") & "%' OR a.action LIKE '%" & searchText.Replace("'", "''") & "%')"
+                sql &= " AND (a.module LIKE @s OR a.action LIKE @s)"
             End If
 
             sql &= " ORDER BY a.timestamp DESC"
 
-            GetQuery(sql, "logs")
+            GetQuery(sql, "logs", P("@uid", userId), P("@from", If(fromDate.HasValue, CObj(fromDate.Value.Date), Nothing)),
+                     P("@to", If(toDate.HasValue, CObj(toDate.Value.Date.AddDays(1)), Nothing)), P("@s", "%" & searchText & "%"))
 
             If ds.Tables.Contains("logs") AndAlso ds.Tables("logs").Rows.Count > 0 Then
                 For Each row As DataRow In ds.Tables("logs").Rows
@@ -64,23 +66,24 @@
                                 "INNER JOIN tblusers u ON l.userid = u.userid WHERE 1=1 "
 
             If userId <> 0 Then
-                sql &= " AND u.userid = " & userId
+                sql &= " AND u.userid = @uid"
             End If
 
             If fromDate.HasValue Then
-                sql &= " AND l.logintime >= '" & fromDate.Value.ToString("yyyy-MM-dd 00:00:00") & "' "
+                sql &= " AND l.logintime >= @from"
             End If
             If toDate.HasValue Then
-                sql &= " AND l.logintime <= '" & toDate.Value.ToString("yyyy-MM-dd 23:59:59") & "' "
+                sql &= " AND l.logintime < @to"
             End If
 
             If Not String.IsNullOrWhiteSpace(searchText) Then
-                sql &= " AND u.fname LIKE '%" & searchText.Replace("'", "''") & "%'"
+                sql &= " AND CONCAT(u.fname, ' ', u.lname) LIKE @s"
             End If
 
             sql &= " ORDER BY l.logintime DESC"
 
-            GetQuery(sql, "loginlogs")
+            GetQuery(sql, "loginlogs", P("@uid", userId), P("@from", If(fromDate.HasValue, CObj(fromDate.Value.Date), Nothing)),
+                     P("@to", If(toDate.HasValue, CObj(toDate.Value.Date.AddDays(1)), Nothing)), P("@s", "%" & searchText & "%"))
 
             If ds.Tables.Contains("loginlogs") AndAlso ds.Tables("loginlogs").Rows.Count > 0 Then
                 For Each row As DataRow In ds.Tables("loginlogs").Rows

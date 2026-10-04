@@ -1,25 +1,36 @@
 ﻿Public Class DlgAddUnits
 
+    Private Sub DlgAddUnits_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        ' The dialog is reused, so don't show the unit typed last time.
+        txtunittype.Clear()
+    End Sub
+
     Private Sub btnsave_Click(sender As Object, e As EventArgs) Handles btnsave.Click
+        Dim unitType As String = txtunittype.Text.Trim()
+
         ' Validate input
-        If String.IsNullOrWhiteSpace(txtunittype.Text) Then
+        If unitType = "" Then
             MessageBox.Show("Unit type cannot be empty.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             txtunittype.Focus()
             Exit Sub
         End If
 
-        ' Optional: Check if unit type already exists
-        Dim checkSql As String = "SELECT * FROM tblproductunit WHERE unittype = '" & txtunittype.Text.Replace("'", "''") & "'"
-        GetQuery(checkSql, "checkDup")
-        If ds.Tables("checkDup").Rows.Count > 0 Then
+        If unitType.Length > 50 Then
+            MessageBox.Show("Unit type can be at most 50 characters.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            txtunittype.Focus()
+            Exit Sub
+        End If
+
+        ' Check if unit type already exists
+        If CInt(GetValue("SELECT COUNT(*) FROM tblproductunit WHERE unittype = @u", P("@u", unitType))) > 0 Then
             MessageBox.Show("Unit type already exists.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             txtunittype.Focus()
             Exit Sub
         End If
 
         ' Insert into database
-        Dim sql As String = "INSERT INTO tblproductunit (unittype) VALUES ('" & txtunittype.Text.Replace("'", "''") & "')"
-        SetQuery(sql)
+        If Not SetQuery("INSERT INTO tblproductunit (unittype) VALUES (@u)", P("@u", unitType)) Then Exit Sub
+        LogActivity("Units", "Added unit: " & unitType, GetLastInsertedID())
 
         ' Success message
         MessageBox.Show("Unit added successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)

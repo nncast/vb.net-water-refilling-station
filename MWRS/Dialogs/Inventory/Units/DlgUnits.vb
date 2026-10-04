@@ -6,14 +6,12 @@
 
         Dim sql As String = "SELECT * FROM tblproductunit"
         If keyword <> "" Then
-            ' NOTE: While Replace("'", "''") offers basic protection, 
-            ' it's safer to use parameterized queries for production code.
-            sql &= " WHERE unittype LIKE '%" & keyword.Replace("'", "''") & "%'"
+            sql &= " WHERE unittype LIKE @k"
         End If
         sql &= " ORDER BY unittype"
 
         ' Populate the DataSet
-        GetQuery(sql, "tblproductunit")
+        GetQuery(sql, "tblproductunit", P("@k", "%" & keyword & "%"))
 
         ' Loop through dataset and add to ListView
         For Each row As DataRow In ds.Tables("tblproductunit").Rows
@@ -72,9 +70,16 @@
         Dim unitId As Integer = Convert.ToInt32(lvunits.SelectedItems(0).Text)
         Dim unitType As String = lvunits.SelectedItems(0).SubItems(1).Text
 
+        Dim used As Integer = CInt(GetValue("SELECT COUNT(*) FROM tblproducts WHERE unitid = @u", P("@u", unitId)))
+        If used > 0 Then
+            MessageBox.Show("The unit '" & unitType & "' is used by " & used & " product(s) and can't be deleted.", "Unit In Use", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Exit Sub
+        End If
+
         If MessageBox.Show("Are you sure you want to delete the unit '" & unitType & "'?", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) = DialogResult.Yes Then
-            ' Use SetQuery to delete
-            SetQuery("DELETE FROM tblproductunit WHERE unitid=" & unitId)
+            If SetQuery("DELETE FROM tblproductunit WHERE unitid = @u", P("@u", unitId)) Then
+                LogActivity("Units", "Deleted unit: " & unitType, unitId)
+            End If
             Fill()
         End If
     End Sub

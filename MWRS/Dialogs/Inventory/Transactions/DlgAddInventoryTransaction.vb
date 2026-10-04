@@ -1,6 +1,9 @@
 ﻿Public Class DlgAddInventoryTransaction
     Private dtProducts As DataTable
     Private Sub DlgAddInventoryTransaction_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        ' The designer default maximum of 100 blocked larger deliveries of stock.
+        nudqty.Maximum = 1000000
+
         loadProducts()
         loadTransTypes()
         clear()
@@ -29,6 +32,7 @@
         cmbtranstype.Items.Clear()
         cmbtranstype.Items.Add("Stock In")
         cmbtranstype.Items.Add("Stock Out")
+        cmbtranstype.DropDownStyle = ComboBoxStyle.DropDownList
     End Sub
 
     '----------------------------------------
@@ -42,10 +46,9 @@
         Dim transtype As String = cmbtranstype.Text
         Dim qty As Integer = CInt(nudqty.Value)
         Dim remarks As String = txtremarks.Text.Trim()
-        Dim userid As Integer = Globals.UserID
 
         ' --- Check product status and stock ---
-        GetQuery("SELECT stockqty, status FROM tblproducts WHERE productid = " & productid, "tblproducts")
+        GetQuery("SELECT stockqty, status FROM tblproducts WHERE productid = @p", "tblproducts", P("@p", productid))
 
         If ds.Tables("tblproducts").Rows.Count = 0 Then
             MsgBox("Product not found.", MsgBoxStyle.Critical)
@@ -65,29 +68,44 @@
             Exit Sub
         End If
 
+        If IsOrderTransaction(remarks) Then
+            MsgBox("Remarks like """ & remarks & """ are reserved for stock moved by orders. Please describe this transaction differently.", MsgBoxStyle.Exclamation)
+            Exit Sub
+        End If
+
         ' --- Confirm save ---
         If MsgBox("Save this transaction?", MsgBoxStyle.YesNo + MsgBoxStyle.Question) = MsgBoxResult.No Then
             Exit Sub
         End If
 
-        ' --- Insert transaction ---
-        Dim sqlInsert As String =
-            "INSERT INTO tblinventorytransactions (productid, userid, transtype, qty, remarks) VALUES (" &
-            productid & ", " & userid & ", '" & transtype.Replace("'", "''") & "', " &
-            qty & ", '" & remarks.Replace("'", "''") & "')"
+        Try
+            BeginTransaction()
 
-        SetQuery(sqlInsert)
+            ' Re-check the stock inside the transaction in case it changed meanwhile.
+            Dim stock As Integer = CInt(GetValue("SELECT stockqty FROM tblproducts WHERE productid = @p FOR UPDATE", P("@p", productid)))
+            If transtype = "Stock Out" AndAlso qty > stock Then
+                Throw New ApplicationException("Insufficient stock. Available quantity: " & stock)
+            End If
 
-        ' --- Update stock quantity ---
-        Dim sqlUpdate As String
-        If transtype = "Stock In" Then
-            sqlUpdate = "UPDATE tblproducts SET stockqty = stockqty + " & qty & " WHERE productid = " & productid
-        Else
-            sqlUpdate = "UPDATE tblproducts SET stockqty = stockqty - " & qty & " WHERE productid = " & productid
-        End If
+            ' --- Insert transaction ---
+            Execute("INSERT INTO tblinventorytransactions (productid, userid, transtype, qty, remarks) VALUES (@p, @u, @t, @q, @r)",
+                    P("@p", productid), P("@u", Globals.UserID), P("@t", transtype), P("@q", qty), P("@r", remarks))
 
-        SetQuery(sqlUpdate)
-        LogActivity("Inventory", transtype & " - " & qty & " units", productid)
+            ' --- Update stock quantity ---
+            If transtype = "Stock In" Then
+                Execute("UPDATE tblproducts SET stockqty = stockqty + @q WHERE productid = @p", P("@q", qty), P("@p", productid))
+            Else
+                Execute("UPDATE tblproducts SET stockqty = stockqty - @q WHERE productid = @p", P("@q", qty), P("@p", productid))
+            End If
+
+            LogActivity("Inventory", transtype & " - " & qty & " units", productid)
+            CommitTransaction()
+        Catch ex As Exception
+            RollbackTransaction()
+            MsgBox("Could not save the transaction: " & ex.Message, MsgBoxStyle.Exclamation)
+            Exit Sub
+        End Try
+
         MsgBox("Transaction recorded successfully.", MsgBoxStyle.Information)
 
         Me.DialogResult = DialogResult.OK
@@ -130,7 +148,7 @@
         cmbproduct.SelectedIndex = -1
         cmbtranstype.SelectedIndex = -1
         cmbtranstype.Text = ""
-        nudqty.Value = 0
+        nudqty.Value = nudqty.Minimum
         txtremarks.Clear()
     End Sub
 End Class

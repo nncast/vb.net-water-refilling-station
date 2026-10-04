@@ -37,6 +37,20 @@
         End Try
     End Sub
 
+    ' Explains why the account can't be deleted or deactivated, or returns Nothing if it can.
+    Private Function BlockReason(userID As Integer) As String
+        If userID = Globals.UserID Then
+            Return "You can't delete or deactivate your own account while you are logged in."
+        End If
+
+        Dim isActiveAdmin As Boolean = CInt(GetValue("SELECT COUNT(*) FROM tblusers WHERE userid = @u AND role = 'Admin' AND status = 'Active'", P("@u", userID))) > 0
+        If isActiveAdmin AndAlso CInt(GetValue("SELECT COUNT(*) FROM tblusers WHERE role = 'Admin' AND status = 'Active' AND userid <> @u", P("@u", userID))) = 0 Then
+            Return "This is the last active Admin account, so it can't be deleted or deactivated."
+        End If
+
+        Return Nothing
+    End Function
+
     Private Sub btndelete_Click(sender As Object, e As EventArgs) Handles btndelete.Click
         Try
             If lvemployee.SelectedItems.Count = 0 Then
@@ -46,39 +60,31 @@
 
             Dim selectedID As Integer = CInt(lvemployee.SelectedItems(0).Text)
 
-            ' --- Check for linked records ---
-            Dim checkSql As String =
-                "SELECT COUNT(*) AS cnt FROM (" &
-                "SELECT userid FROM tblorders WHERE userid = " & selectedID & " " &
-                "UNION ALL " &
-                "SELECT userid FROM tblsales WHERE userid = " & selectedID & " " &
-                "UNION ALL " &
-                "SELECT userid FROM tblinventorytransactions WHERE userid = " & selectedID & " " &
-                "UNION ALL " &
-                "SELECT userid FROM tblactivitylogs WHERE userid = " & selectedID & " " &
-                "UNION ALL " &
-                "SELECT userid FROM tblloginlogs WHERE userid = " & selectedID & " " &
-                "UNION ALL " &
-                "SELECT userid FROM tbldelivery WHERE userid = " & selectedID &
-                ") AS linked"
-
-            GetQuery(checkSql, "checklinks")
-
-            Dim recordCount As Integer = 0
-            If ds.Tables("checklinks").Rows.Count > 0 Then
-                recordCount = CInt(ds.Tables("checklinks").Rows(0)("cnt"))
+            Dim reason As String = BlockReason(selectedID)
+            If reason IsNot Nothing Then
+                MsgBox(reason, MsgBoxStyle.Exclamation, "Not Allowed")
+                Exit Sub
             End If
+
+            ' --- Check for linked records ---
+            Dim recordCount As Integer = CInt(GetValue(
+                "SELECT (SELECT COUNT(*) FROM tblorders WHERE userid = @u) + " &
+                "(SELECT COUNT(*) FROM tblsales WHERE userid = @u) + " &
+                "(SELECT COUNT(*) FROM tblinventorytransactions WHERE userid = @u) + " &
+                "(SELECT COUNT(*) FROM tblactivitylogs WHERE userid = @u) + " &
+                "(SELECT COUNT(*) FROM tblloginlogs WHERE userid = @u) + " &
+                "(SELECT COUNT(*) FROM tbldelivery WHERE userid = @u)", P("@u", selectedID)))
 
             ' --- Suggest Inactivate if linked ---
             If recordCount > 0 Then
                 Dim msgResult = MsgBox("Cannot delete this user because they are linked to existing records." &
                                        vbCrLf & "Do you want to set this user as INACTIVE instead?", MsgBoxStyle.YesNo + MsgBoxStyle.Question, "User Linked")
                 If msgResult = MsgBoxResult.Yes Then
-                    Dim inactSql As String = "UPDATE tblusers SET status='Inactive' WHERE userid=" & selectedID
-                    SetQuery(inactSql)
-                    LogActivity("User", "Set User Inactive", selectedID)
-                    MsgBox("User has been set to INACTIVE.", MsgBoxStyle.Information)
-                    fill()
+                    If SetQuery("UPDATE tblusers SET status = 'Inactive' WHERE userid = @u", P("@u", selectedID)) Then
+                        LogActivity("User", "Set User Inactive", selectedID)
+                        MsgBox("User has been set to INACTIVE.", MsgBoxStyle.Information)
+                        fill()
+                    End If
                 End If
                 Exit Sub
             End If
@@ -87,8 +93,7 @@
             Dim result = MsgBox("Are you sure you want to delete this user?", MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Confirm Delete")
             If result = MsgBoxResult.No Then Exit Sub
 
-            Dim sql As String = "DELETE FROM tblusers WHERE userid = " & selectedID
-            SetQuery(sql)
+            If Not SetQuery("DELETE FROM tblusers WHERE userid = @u", P("@u", selectedID)) Then Exit Sub
             LogActivity("User", "Delete User", selectedID)
 
             MsgBox("User deleted successfully.", MsgBoxStyle.Information)
@@ -118,22 +123,16 @@
         Try
             lvemployee.Items.Clear()
 
-            Dim sql As String = "SELECT userid, fname, lname, username, password, role, status FROM tblusers"
+            ' Passwords are stored hashed; they are neither listed nor searchable.
+            Dim sql As String = "SELECT userid, fname, lname, username, role, status FROM tblusers"
 
             If keyword <> "" Then
-                sql &= " WHERE CAST(userid AS CHAR) LIKE '%" & keyword & "%' " &
-                       "OR fname LIKE '%" & keyword & "%' " &
-                       "OR lname LIKE '%" & keyword & "%'" &
-                       "OR username LIKE '%" & keyword & "%'" &
-                       "OR password LIKE '%" & keyword & "%' " &
-                       "OR role LIKE '%" & keyword & "%'" &
-                       "OR status LIKE '%" & keyword & "%'"
+                sql &= " WHERE CAST(userid AS CHAR) LIKE @k OR fname LIKE @k OR lname LIKE @k OR username LIKE @k OR role LIKE @k OR status LIKE @k"
             End If
 
             sql &= " ORDER BY lname, fname"
 
-            ds.Tables.Clear()
-            GetQuery(sql, "tblusers")
+            GetQuery(sql, "tblusers", P("@k", "%" & keyword & "%"))
 
             If ds.Tables("tblusers").Rows.Count = 0 Then Exit Sub
 
@@ -142,21 +141,12 @@
                 item.SubItems.Add(row("fname").ToString())
                 item.SubItems.Add(row("lname").ToString())
                 item.SubItems.Add(row("username").ToString())
-                item.SubItems.Add(row("password").ToString())
                 item.SubItems.Add(row("role").ToString())
                 item.SubItems.Add(row("status").ToString())
                 lvemployee.Items.Add(item)
             Next
         Catch ex As Exception
             MsgBox("Error filling user list: " & ex.Message, MsgBoxStyle.Critical)
-        End Try
-    End Sub
-
-    Private Sub txtsearch_TextChanged(sender As Object, e As EventArgs)
-        Try
-            fill(txtsearch.Text)
-        Catch ex As Exception
-            MsgBox("Error searching users: " & ex.Message, MsgBoxStyle.Critical)
         End Try
     End Sub
 

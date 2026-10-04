@@ -33,7 +33,6 @@
 
             If DlgUpdateCustomer.ShowDialog() = DialogResult.OK Then
                 fill()
-                LogActivity("Customer", "Updated customer information", selectedID)
             End If
         Catch ex As Exception
             MsgBox("Error editing customer: " & ex.Message, MsgBoxStyle.Critical)
@@ -50,21 +49,10 @@
             Dim selectedID As Integer = CInt(lvcustomers.SelectedItems(0).Text)
 
             ' --- Check for linked records ---
-            Dim checkSql As String =
-                "SELECT COUNT(*) AS cnt FROM (" &
-                "SELECT custid FROM tblorders WHERE custid = " & selectedID & " " &
-                "UNION ALL " &
-                "SELECT custid FROM tblsales WHERE custid = " & selectedID & " " &
-                "UNION ALL " &
-                "SELECT custid FROM tblcustomertransactions WHERE custid = " & selectedID &
-                ") AS linked"
-
-            GetQuery(checkSql, "checklinks")
-
-            Dim recordCount As Integer = 0
-            If ds.Tables("checklinks").Rows.Count > 0 Then
-                recordCount = CInt(ds.Tables("checklinks").Rows(0)("cnt"))
-            End If
+            Dim recordCount As Integer = CInt(GetValue(
+                "SELECT (SELECT COUNT(*) FROM tblorders WHERE custid = @c) + " &
+                "(SELECT COUNT(*) FROM tblsales WHERE custid = @c) + " &
+                "(SELECT COUNT(*) FROM tblcustomertransactions WHERE custid = @c)", P("@c", selectedID)))
 
             ' --- Prevent deletion if linked ---
             If recordCount > 0 Then
@@ -76,15 +64,18 @@
             Dim result = MsgBox("Are you sure you want to delete this customer?", MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Confirm Delete")
             If result = MsgBoxResult.No Then Exit Sub
 
-            ' --- Remove balance record first ---
-            Dim sqlBalance As String = "DELETE FROM tblcustomerbalance WHERE custid = " & selectedID
-            SetQuery(sqlBalance)
+            ' --- Remove the balance record and the customer together ---
+            Try
+                BeginTransaction()
+                Execute("DELETE FROM tblcustomerbalance WHERE custid = @c", P("@c", selectedID))
+                Execute("DELETE FROM tblcustomers WHERE custid = @c", P("@c", selectedID))
+                LogActivity("Customer", "Deleted customer record", selectedID)
+                CommitTransaction()
+            Catch ex As Exception
+                RollbackTransaction()
+                Throw
+            End Try
 
-            ' --- Delete customer ---
-            Dim sqlCust As String = "DELETE FROM tblcustomers WHERE custid = " & selectedID
-            SetQuery(sqlCust)
-
-            LogActivity("Customer", "Deleted customer record", selectedID)
             MsgBox("Customer deleted successfully.", MsgBoxStyle.Information)
             fill()
 
@@ -121,28 +112,26 @@
 
             ' Filter barangay
             If barangayId > 0 Then
-                sql &= " AND c.barangayid=" & barangayId
+                sql &= " AND c.barangayid = @b"
             End If
 
             ' Filter purok
             If purokId > 0 Then
-                sql &= " AND c.purokid=" & purokId
+                sql &= " AND c.purokid = @p"
             End If
 
             ' Keyword filter
             If keyword <> "" Then
-                Dim k As String = keyword.Replace("'", "''")
-                sql &= " AND (c.fullname LIKE '%" & k & "%' " &
-                       "OR b.barangayname LIKE '%" & k & "%' " &
-                       "OR p.purokname LIKE '%" & k & "%' " &
-                       "OR c.contact LIKE '%" & k & "%' " &
-                       "OR c.notes LIKE '%" & k & "%')"
+                sql &= " AND (c.fullname LIKE @k " &
+                       "OR b.barangayname LIKE @k " &
+                       "OR p.purokname LIKE @k " &
+                       "OR c.contact LIKE @k " &
+                       "OR c.notes LIKE @k)"
             End If
 
             sql &= " ORDER BY c.fullname"
 
-            ds.Tables.Clear()
-            GetQuery(sql, "tblcustomers")
+            GetQuery(sql, "tblcustomers", P("@b", barangayId), P("@p", purokId), P("@k", "%" & keyword & "%"))
 
             If Not ds.Tables.Contains("tblcustomers") Then Exit Sub
 
@@ -172,7 +161,6 @@
 
             If editDlg.ShowDialog() = DialogResult.OK Then
                 fill()
-                LogActivity("Customer", "Updated customer via double-click", selectedID)
             End If
         Catch ex As Exception
             MsgBox("Error editing customer via double-click: " & ex.Message, MsgBoxStyle.Critical)
@@ -233,7 +221,7 @@
 
         ' Load real puroks
         Dim realPuroks As DataTable =
-            GetDataTable("SELECT purokid, purokname FROM tblpuroks WHERE barangayid=" & barangayId & " ORDER BY purokname")
+            GetDataTable("SELECT purokid, purokname FROM tblpuroks WHERE barangayid = @b ORDER BY purokname", P("@b", barangayId))
 
         For Each r As DataRow In realPuroks.Rows
             Dim nr As DataRow = dt.NewRow()
@@ -250,10 +238,12 @@
     End Sub
 
 
-    Private Function GetDataTable(sql As String) As DataTable
+    Private Function GetDataTable(sql As String, ParamArray params() As MySqlParameter) As DataTable
         Dim tableName As String = "tmp_" & Guid.NewGuid().ToString("N")
-        GetQuery(sql, tableName)
-        Return ds.Tables(tableName).Copy()
+        GetQuery(sql, tableName, params)
+        Dim copy As DataTable = ds.Tables(tableName).Copy()
+        ds.Tables.Remove(tableName)
+        Return copy
     End Function
     Private Sub cmbbarangay_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbbarangay.SelectedIndexChanged
         Try

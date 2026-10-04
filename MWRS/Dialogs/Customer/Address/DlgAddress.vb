@@ -3,6 +3,10 @@ Imports System.Data
 
 Public Class DlgAddress
 
+    ' List columns: 0 = hidden ID, 1 = row number, 2 = name.
+    Private Const NameColumn As Integer = 2
+    Private Const MaxNameLength As Integer = 100
+
     Private Sub DlgAddress_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         LoadBarangays()
         lvpurok.Enabled = False
@@ -28,7 +32,7 @@ Public Class DlgAddress
         lvpurok.Enabled = False
     End Sub
 
-   
+
 
 
 
@@ -50,7 +54,7 @@ Public Class DlgAddress
     ' Load Puroks for Selected Barangay
     '==========================
     Private Sub LoadPuroks(barangayId As Integer)
-        Dim dt As DataTable = GetDataTable("SELECT purokid, purokname FROM tblpuroks WHERE barangayid=" & barangayId & " ORDER BY purokname")
+        Dim dt As DataTable = GetDataTable("SELECT purokid, purokname FROM tblpuroks WHERE barangayid = @b ORDER BY purokname", P("@b", barangayId))
 
         lvpurok.Items.Clear()
         Dim rowNumber As Integer = 1
@@ -64,20 +68,35 @@ Public Class DlgAddress
         lvpurok.Enabled = True
     End Sub
 
-    Private Function GetDataTable(sql As String) As DataTable
+    Private Function GetDataTable(sql As String, ParamArray params() As MySqlParameter) As DataTable
         Dim tableName As String = "tmp_" & Guid.NewGuid().ToString("N")
-        GetQuery(sql, tableName)
-        Return ds.Tables(tableName).Copy()
+        GetQuery(sql, tableName, params)
+        Dim copy As DataTable = ds.Tables(tableName).Copy()
+        ds.Tables.Remove(tableName)
+        Return copy
+    End Function
+
+    ' Asks for a name; returns Nothing when cancelled or invalid.
+    Private Function AskName(prompt As String, title As String, Optional current As String = "") As String
+        Dim name As String = InputBox(prompt, title, current).Trim()
+        If name = "" Then Return Nothing
+
+        If name.Length > MaxNameLength Then
+            MsgBox("The name can be at most " & MaxNameLength & " characters.", MsgBoxStyle.Exclamation)
+            Return Nothing
+        End If
+        Return name
     End Function
 
     '==========================
     ' Add Barangay
     '==========================
     Private Sub btnaddbarangay_Click(sender As Object, e As EventArgs) Handles btnaddbarangay.Click
-        Dim name As String = InputBox("Enter Barangay Name:", "Add Barangay")
-        If String.IsNullOrWhiteSpace(name) Then Exit Sub
+        Dim name As String = AskName("Enter Barangay Name:", "Add Barangay")
+        If name Is Nothing Then Exit Sub
 
-        SetQuery("INSERT INTO tblbarangays (barangayname) VALUES ('" & name.Replace("'", "''") & "')")
+        If BarangayExists(name, 0) Then Exit Sub
+        SetQuery("INSERT INTO tblbarangays (barangayname) VALUES (@n)", P("@n", name))
         LoadBarangays()
     End Sub
 
@@ -88,14 +107,23 @@ Public Class DlgAddress
         If lvbarangay.SelectedItems.Count = 0 Then Exit Sub
 
         Dim id As Integer = CInt(lvbarangay.SelectedItems(0).SubItems(0).Text)
-        Dim oldName As String = lvbarangay.SelectedItems(0).SubItems(1).Text
+        Dim oldName As String = lvbarangay.SelectedItems(0).SubItems(NameColumn).Text
 
-        Dim newName As String = InputBox("Edit Barangay Name:", "Edit Barangay", oldName)
-        If String.IsNullOrWhiteSpace(newName) Then Exit Sub
+        Dim newName As String = AskName("Edit Barangay Name:", "Edit Barangay", oldName)
+        If newName Is Nothing Then Exit Sub
 
-        SetQuery("UPDATE tblbarangays SET barangayname='" & newName.Replace("'", "''") & "' WHERE barangayid=" & id)
+        If BarangayExists(newName, id) Then Exit Sub
+        SetQuery("UPDATE tblbarangays SET barangayname = @n WHERE barangayid = @id", P("@n", newName), P("@id", id))
         LoadBarangays()
     End Sub
+
+    Private Function BarangayExists(name As String, exceptId As Integer) As Boolean
+        If CInt(GetValue("SELECT COUNT(*) FROM tblbarangays WHERE barangayname = @n AND barangayid <> @id", P("@n", name), P("@id", exceptId))) > 0 Then
+            MsgBox("A barangay named '" & name & "' already exists.", MsgBoxStyle.Exclamation)
+            Return True
+        End If
+        Return False
+    End Function
 
     '==========================
     ' Delete Barangay
@@ -106,9 +134,8 @@ Public Class DlgAddress
         ' Get the selected barangay ID
         Dim id As Integer = CInt(lvbarangay.SelectedItems(0).SubItems(0).Text)
 
-        ' Check if any customers are using this barangay
-        Dim dt As DataTable = GetDataTable("SELECT COUNT(*) AS cnt FROM tblcustomers WHERE barangayid=" & id)
-        Dim count As Integer = CInt(dt.Rows(0)("cnt"))
+        ' Check if any customers are using this barangay or one of its puroks
+        Dim count As Integer = CInt(GetValue("SELECT COUNT(*) FROM tblcustomers WHERE barangayid = @id OR purokid IN (SELECT purokid FROM tblpuroks WHERE barangayid = @id)", P("@id", id)))
 
         If count > 0 Then
             MsgBox("Cannot delete this Barangay because it has assigned customers.", MsgBoxStyle.Exclamation)
@@ -118,7 +145,7 @@ Public Class DlgAddress
         If MsgBox("Delete this Barangay? All its Puroks will also be removed.", MsgBoxStyle.YesNo + MsgBoxStyle.Exclamation, "Confirm Delete") = MsgBoxResult.No Then Exit Sub
 
         ' Safe to delete
-        SetQuery("DELETE FROM tblbarangays WHERE barangayid=" & id)
+        SetQuery("DELETE FROM tblbarangays WHERE barangayid = @id", P("@id", id))
         LoadBarangays()
     End Sub
 
@@ -131,10 +158,11 @@ Public Class DlgAddress
         If lvbarangay.SelectedItems.Count = 0 Then Exit Sub
 
         Dim barangayId As Integer = CInt(lvbarangay.SelectedItems(0).SubItems(0).Text)
-        Dim name As String = InputBox("Enter Purok Name:", "Add Purok")
-        If String.IsNullOrWhiteSpace(name) Then Exit Sub
+        Dim name As String = AskName("Enter Purok Name:", "Add Purok")
+        If name Is Nothing Then Exit Sub
 
-        SetQuery("INSERT INTO tblpuroks (barangayid, purokname) VALUES (" & barangayId & ", '" & name.Replace("'", "''") & "')")
+        If PurokExists(barangayId, name, 0) Then Exit Sub
+        SetQuery("INSERT INTO tblpuroks (barangayid, purokname) VALUES (@b, @n)", P("@b", barangayId), P("@n", name))
         LoadPuroks(barangayId)
     End Sub
 
@@ -142,32 +170,40 @@ Public Class DlgAddress
     ' Edit Purok
     '==========================
     Private Sub btneditpurok_Click(sender As Object, e As EventArgs) Handles btneditpurok.Click
-        If lvpurok.SelectedItems.Count = 0 Then Exit Sub
+        If lvpurok.SelectedItems.Count = 0 OrElse lvbarangay.SelectedItems.Count = 0 Then Exit Sub
 
         Dim id As Integer = CInt(lvpurok.SelectedItems(0).SubItems(0).Text)
-        Dim oldName As String = lvpurok.SelectedItems(0).SubItems(1).Text
-
-        Dim newName As String = InputBox("Edit Purok Name:", "Edit Purok", oldName)
-        If String.IsNullOrWhiteSpace(newName) Then Exit Sub
-
-        SetQuery("UPDATE tblpuroks SET purokname='" & newName.Replace("'", "''") & "' WHERE purokid=" & id)
-
+        Dim oldName As String = lvpurok.SelectedItems(0).SubItems(NameColumn).Text
         Dim barangayId As Integer = CInt(lvbarangay.SelectedItems(0).SubItems(0).Text)
+
+        Dim newName As String = AskName("Edit Purok Name:", "Edit Purok", oldName)
+        If newName Is Nothing Then Exit Sub
+
+        If PurokExists(barangayId, newName, id) Then Exit Sub
+        SetQuery("UPDATE tblpuroks SET purokname = @n WHERE purokid = @id", P("@n", newName), P("@id", id))
         LoadPuroks(barangayId)
     End Sub
+
+    Private Function PurokExists(barangayId As Integer, name As String, exceptId As Integer) As Boolean
+        If CInt(GetValue("SELECT COUNT(*) FROM tblpuroks WHERE barangayid = @b AND purokname = @n AND purokid <> @id",
+                         P("@b", barangayId), P("@n", name), P("@id", exceptId))) > 0 Then
+            MsgBox("This barangay already has a purok named '" & name & "'.", MsgBoxStyle.Exclamation)
+            Return True
+        End If
+        Return False
+    End Function
 
     '==========================
     ' Delete Purok
     '==========================
     Private Sub btndeletepurok_Click(sender As Object, e As EventArgs) Handles btndeletepurok.Click
-        If lvpurok.SelectedItems.Count = 0 Then Exit Sub
+        If lvpurok.SelectedItems.Count = 0 OrElse lvbarangay.SelectedItems.Count = 0 Then Exit Sub
 
         ' Get the selected purok ID
         Dim id As Integer = CInt(lvpurok.SelectedItems(0).SubItems(0).Text)
 
         ' Check if any customers are using this purok
-        Dim dt As DataTable = GetDataTable("SELECT COUNT(*) AS cnt FROM tblcustomers WHERE purokid=" & id)
-        Dim count As Integer = CInt(dt.Rows(0)("cnt"))
+        Dim count As Integer = CInt(GetValue("SELECT COUNT(*) FROM tblcustomers WHERE purokid = @id", P("@id", id)))
 
         If count > 0 Then
             MsgBox("Cannot delete this Purok because it has assigned customers.", MsgBoxStyle.Exclamation)
@@ -177,7 +213,7 @@ Public Class DlgAddress
         If MsgBox("Delete this Purok?", MsgBoxStyle.YesNo + MsgBoxStyle.Exclamation, "Confirm Delete") = MsgBoxResult.No Then Exit Sub
 
         ' Safe to delete
-        SetQuery("DELETE FROM tblpuroks WHERE purokid=" & id)
+        SetQuery("DELETE FROM tblpuroks WHERE purokid = @id", P("@id", id))
 
         Dim barangayId As Integer = CInt(lvbarangay.SelectedItems(0).SubItems(0).Text)
         LoadPuroks(barangayId)

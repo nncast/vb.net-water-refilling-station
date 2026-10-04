@@ -30,8 +30,8 @@
     ' Load Puroks
     ' ==========================================================
     Private Sub LoadPuroks(barangayId As Integer)
-        Dim sql As String = "SELECT purokid, purokname FROM tblpuroks WHERE barangayid = " & barangayId & " ORDER BY purokname"
-        Dim dt As DataTable = GetDataTable(sql)
+        Dim sql As String = "SELECT purokid, purokname FROM tblpuroks WHERE barangayid = @b ORDER BY purokname"
+        Dim dt As DataTable = GetDataTable(sql, P("@b", barangayId))
 
         cmbPurok.DataSource = dt
         cmbPurok.DisplayMember = "purokname"
@@ -43,10 +43,12 @@
     ' ==========================================================
     ' Safe DataTable loader (prevents shared table overwrite)
     ' ==========================================================
-    Private Function GetDataTable(sql As String) As DataTable
+    Private Function GetDataTable(sql As String, ParamArray params() As MySqlParameter) As DataTable
         Dim tableName As String = "tmp_" & Guid.NewGuid().ToString("N")
-        GetQuery(sql, tableName)
-        Return ds.Tables(tableName).Copy()
+        GetQuery(sql, tableName, params)
+        Dim copy As DataTable = ds.Tables(tableName).Copy()
+        ds.Tables.Remove(tableName)
+        Return copy
     End Function
 
     ' ==========================================================
@@ -75,36 +77,24 @@
             Dim barangayId As Integer = Convert.ToInt32(cmbBarangay.SelectedValue)
             Dim purokId As Integer = Convert.ToInt32(cmbPurok.SelectedValue)
 
-            Dim fullname As String = txtfullname.Text.Replace("'", "''")
-            Dim number As String = txtnumber.Text.Replace("'", "''")
-            Dim notes As String = txtnotes.Text.Replace("'", "''")
+            ' The customer and their starting balance are saved together.
+            Dim newCustID As Integer
+            Try
+                BeginTransaction()
+                Execute("INSERT INTO tblcustomers (fullname, barangayid, purokid, contact, notes) VALUES (@n, @b, @p, @c, @notes)",
+                        P("@n", txtfullname.Text.Trim()), P("@b", barangayId), P("@p", purokId),
+                        P("@c", txtnumber.Text.Trim()), P("@notes", txtnotes.Text.Trim()))
+                newCustID = GetLastInsertedID()
 
-            Dim sql As String = _
-                "INSERT INTO tblcustomers (fullname, barangayid, purokid, contact, notes) VALUES (" & _
-                "'" & fullname & "', " & barangayId & ", " & purokId & ", '" & number & "', '" & notes & "')"
-
-            SetQuery(sql)
-
-            ' Get new ID
-            GetQuery("SELECT LAST_INSERT_ID() AS lastid", "newid")
-
-            Dim newCustID As Integer = 0
-            If ds.Tables("newid").Rows.Count > 0 Then
-                newCustID = Convert.ToInt32(ds.Tables("newid").Rows(0)("lastid"))
-            End If
-
-            If newCustID = 0 Then
-                MsgBox("Failed to obtain new customer ID.", MsgBoxStyle.Critical)
-                Exit Sub
-            End If
+                Execute("INSERT INTO tblcustomerbalance (custid, balance) VALUES (@id, 0.00)", P("@id", newCustID))
+                LogActivity("Customer", "Added new customer", newCustID)
+                CommitTransaction()
+            Catch
+                RollbackTransaction()
+                Throw
+            End Try
 
             Me.NewCustID = newCustID
-
-            ' Insert starting balance
-            Dim balanceSql As String = "INSERT INTO tblcustomerbalance (custid, balance) VALUES (" & newCustID & ", 0.00)"
-            SetQuery(balanceSql)
-
-            LogActivity("Customer", "Added new customer", newCustID)
 
             MsgBox("Customer added successfully.", MsgBoxStyle.Information)
             Me.DialogResult = DialogResult.OK
@@ -137,6 +127,12 @@
         Try
             If String.IsNullOrWhiteSpace(txtfullname.Text) Then
                 MsgBox("Full name is required.", MsgBoxStyle.Exclamation)
+                txtfullname.Focus()
+                Return False
+            End If
+
+            If txtfullname.Text.Trim().Length > 150 Then
+                MsgBox("Full name can be at most 150 characters.", MsgBoxStyle.Exclamation)
                 txtfullname.Focus()
                 Return False
             End If

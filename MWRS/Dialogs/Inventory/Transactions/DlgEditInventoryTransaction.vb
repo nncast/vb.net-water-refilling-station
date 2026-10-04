@@ -3,6 +3,9 @@
     Private dtProducts As New DataTable()
 
     Private Sub DlgEditInventoryTransaction_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        ' The designer default maximum of 100 cut larger quantities down when loading.
+        nudqty.Maximum = 1000000
+
         LoadTransType()
         LoadProducts()
         LoadTransactionData()
@@ -10,9 +13,9 @@
 
     ' ---------------- LOAD PRODUCTS ----------------
     Private Sub LoadProducts()
-        If ds.Tables.Contains("tblproducts") Then ds.Tables("tblproducts").Clear()
-
-        GetQuery("SELECT productid, name FROM tblproducts WHERE status='Active' ORDER BY name", "tblproducts")
+        ' Active products, plus this transaction's own product even if it is inactive now.
+        GetQuery("SELECT productid, name FROM tblproducts WHERE status = 'Active' " &
+                 "OR productid = (SELECT productid FROM tblinventorytransactions WHERE transid = @t) ORDER BY name", "tblproducts", P("@t", TransactionId))
         dtProducts = ds.Tables("tblproducts").Copy()
 
         cmbproduct.DataSource = dtProducts
@@ -35,8 +38,7 @@
     Private Sub LoadTransactionData()
         If TransactionId <= 0 Then Exit Sub
 
-        If ds.Tables.Contains("tbltransaction") Then ds.Tables("tbltransaction").Clear()
-        GetQuery("SELECT productid, transtype, qty, transdate, remarks FROM tblinventorytransactions WHERE transid = " & TransactionId, "tbltransaction")
+        GetQuery("SELECT productid, transtype, qty, transdate, remarks FROM tblinventorytransactions WHERE transid = @t", "tbltransaction", P("@t", TransactionId))
 
         If ds.Tables("tbltransaction").Rows.Count = 0 Then
             MsgBox("Transaction not found.", MsgBoxStyle.Critical)
@@ -87,66 +89,69 @@
             Exit Sub
         End If
 
-        ' --- Get previous transaction details ---
-        Dim prevSql As String = "SELECT productid, transtype, qty FROM tblinventorytransactions WHERE transid = " & TransactionId
-        If ds.Tables.Contains("tblprevtrans") Then ds.Tables("tblprevtrans").Clear()
-        GetQuery("SELECT productid, transtype, qty FROM tblinventorytransactions WHERE transid = " & TransactionId, "tblprevtrans")
-
-        If ds.Tables("tblprevtrans").Rows.Count = 0 Then
-            MsgBox("Previous transaction not found.", MsgBoxStyle.Critical)
-            Exit Sub
-        End If
-
-        Dim oldProductId As Integer = CInt(ds.Tables("tblprevtrans").Rows(0)("productid"))
-        Dim oldType As String = ds.Tables("tblprevtrans").Rows(0)("transtype").ToString()
-        Dim oldQty As Integer = CInt(ds.Tables("tblprevtrans").Rows(0)("qty"))
-
-
         Dim newProductId As Integer = CInt(cmbproduct.SelectedValue)
         Dim newType As String = cmbtranstype.Text
         Dim newQty As Integer = CInt(nudqty.Value)
+        Dim remarks As String = txtremarks.Text.Trim()
 
-        ' --- Restore old stock effect ---
-        Dim sqlUpdate As String = ""
-        If oldType = "Stock In" Then
-            sqlUpdate = "UPDATE tblproducts SET stockqty = stockqty - " & oldQty & " WHERE productid = " & oldProductId
-        ElseIf oldType = "Stock Out" Then
-            sqlUpdate = "UPDATE tblproducts SET stockqty = stockqty + " & oldQty & " WHERE productid = " & oldProductId
+        If IsOrderTransaction(remarks) Then
+            MsgBox("Remarks like """ & remarks & """ are reserved for stock moved by orders. Please describe this transaction differently.", MsgBoxStyle.Exclamation)
+            Exit Sub
         End If
-        SetQuery(sqlUpdate)
 
-        ' --- Apply new stock effect ---
-        If newType = "Stock In" Then
-            sqlUpdate = "UPDATE tblproducts SET stockqty = stockqty + " & newQty & " WHERE productid = " & newProductId
-        ElseIf newType = "Stock Out" Then
-            ' Optional: Check if enough stock exists
-            If ds.Tables.Contains("tblstockcheck") Then ds.Tables("tblstockcheck").Clear()
-            GetQuery("SELECT stockqty FROM tblproducts WHERE productid = " & newProductId, "tblstockcheck")
+        Try
+            BeginTransaction()
 
-            Dim currentStock As Integer = 0
-            If ds.Tables("tblstockcheck").Rows.Count > 0 Then
-                currentStock = CInt(ds.Tables("tblstockcheck").Rows(0)("stockqty"))
+            ' --- Get previous transaction details ---
+            GetQuery("SELECT productid, transtype, qty, remarks FROM tblinventorytransactions WHERE transid = @t FOR UPDATE", "tblprevtrans", P("@t", TransactionId))
+            If ds.Tables("tblprevtrans").Rows.Count = 0 Then Throw New ApplicationException("Previous transaction not found.")
+
+            Dim oldProductId As Integer = CInt(ds.Tables("tblprevtrans").Rows(0)("productid"))
+            Dim oldType As String = ds.Tables("tblprevtrans").Rows(0)("transtype").ToString()
+            Dim oldQty As Integer = CInt(ds.Tables("tblprevtrans").Rows(0)("qty"))
+
+            If IsOrderTransaction(ds.Tables("tblprevtrans").Rows(0)("remarks").ToString()) Then
+                Throw New ApplicationException("This stock movement was made by an order. Change or cancel the order instead.")
             End If
 
-            sqlUpdate = "UPDATE tblproducts SET stockqty = stockqty - " & newQty & " WHERE productid = " & newProductId
-        End If
-        SetQuery(sqlUpdate)
+            ' --- Undo the old stock effect, apply the new one, never below zero ---
+            Dim undo As Integer = If(oldType = "Stock In", -oldQty, oldQty)
+            Dim redo As Integer = If(newType = "Stock In", newQty, -newQty)
+            If oldProductId = newProductId Then
+                AdjustStock(newProductId, undo + redo)
+            Else
+                AdjustStock(oldProductId, undo)
+                AdjustStock(newProductId, redo)
+            End If
 
-        ' --- Update transaction record ---
-        Dim sql As String =
-            "UPDATE tblinventorytransactions SET " &
-            "productid = " & newProductId & ", " &
-            "transtype = '" & newType & "', " &
-            "qty = " & newQty & ", " &
-            "transdate = '" & Format(dtptransdate.Value, "yyyy-MM-dd HH:mm:ss") & "', " &
-            "remarks = '" & txtremarks.Text.Replace("'", "''") & "' " &
-            "WHERE transid = " & TransactionId
-        SetQuery(sql)
-        LogActivity("Inventory", "Updated Transaction", TransactionId)
+            ' --- Update transaction record ---
+            Execute("UPDATE tblinventorytransactions SET productid = @p, transtype = @t, qty = @q, transdate = @d, remarks = @r WHERE transid = @id",
+                    P("@p", newProductId), P("@t", newType), P("@q", newQty), P("@d", dtptransdate.Value), P("@r", remarks), P("@id", TransactionId))
+            LogActivity("Inventory", "Updated Transaction", TransactionId)
+            CommitTransaction()
+        Catch ex As Exception
+            RollbackTransaction()
+            MsgBox("Could not update the transaction: " & ex.Message, MsgBoxStyle.Exclamation)
+            Exit Sub
+        End Try
 
         MsgBox("Transaction updated successfully.", MsgBoxStyle.Information)
         Me.DialogResult = DialogResult.OK
         Me.Close()
+    End Sub
+
+    ' Adds change to a product's stock inside the open transaction; refuses to go below zero.
+    Private Sub AdjustStock(productId As Integer, change As Integer)
+        GetQuery("SELECT name, stockqty FROM tblproducts WHERE productid = @p FOR UPDATE", "tblstockcheck", P("@p", productId))
+        If ds.Tables("tblstockcheck").Rows.Count = 0 Then Throw New ApplicationException("Product not found.")
+
+        Dim stock As Integer = CInt(ds.Tables("tblstockcheck").Rows(0)("stockqty"))
+        If stock + change < 0 Then
+            Throw New ApplicationException("Not enough stock for " & ds.Tables("tblstockcheck").Rows(0)("name").ToString() &
+                                           " (has " & stock & ", this change needs " & -change & ").")
+        End If
+
+        Execute("UPDATE tblproducts SET stockqty = stockqty + @c WHERE productid = @p", P("@c", change), P("@p", productId))
     End Sub
 
 

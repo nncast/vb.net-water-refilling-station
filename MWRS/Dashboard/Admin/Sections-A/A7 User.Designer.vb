@@ -34,7 +34,6 @@ Partial Class A7_User
         Me.fname = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.lname = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.username = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
-        Me.password = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.role = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.status = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.ShapeContainer1 = New Microsoft.VisualBasic.PowerPacks.ShapeContainer()
@@ -125,7 +124,7 @@ Partial Class A7_User
         'lvemployee
         '
         Me.lvemployee.BorderStyle = System.Windows.Forms.BorderStyle.None
-        Me.lvemployee.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.id, Me.fname, Me.lname, Me.username, Me.password, Me.role, Me.status})
+        Me.lvemployee.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.id, Me.fname, Me.lname, Me.username, Me.role, Me.status})
         Me.lvemployee.FullRowSelect = True
         Me.lvemployee.GridLines = True
         Me.lvemployee.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable
@@ -155,17 +154,12 @@ Partial Class A7_User
         'username
         '
         Me.username.Text = "Username"
-        Me.username.Width = 190
-        '
-        'password
-        '
-        Me.password.Text = "Password"
-        Me.password.Width = 190
+        Me.username.Width = 285
         '
         'role
         '
         Me.role.Text = "Role"
-        Me.role.Width = 150
+        Me.role.Width = 245
         '
         'status
         '
@@ -223,7 +217,6 @@ Partial Class A7_User
     Friend WithEvents fname As System.Windows.Forms.ColumnHeader
     Friend WithEvents lname As System.Windows.Forms.ColumnHeader
     Friend WithEvents username As System.Windows.Forms.ColumnHeader
-    Friend WithEvents password As System.Windows.Forms.ColumnHeader
     Friend WithEvents role As System.Windows.Forms.ColumnHeader
     Friend WithEvents ShapeContainer1 As Microsoft.VisualBasic.PowerPacks.ShapeContainer
     Friend WithEvents RectangleShape1 As Microsoft.VisualBasic.PowerPacks.RectangleShape

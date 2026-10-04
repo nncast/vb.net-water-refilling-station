@@ -7,27 +7,22 @@
             Exit Sub
         End If
 
-        ' Check if category already exists
-        Dim checkSql As String = "SELECT * FROM tblproductcategories WHERE name = '" & categoryName.Replace("'", "''") & "'"
-        GetQuery(checkSql, "checkCat")
+        If categoryName.Length > 50 Then
+            MsgBox("Category name can be at most 50 characters.", MsgBoxStyle.Exclamation)
+            Exit Sub
+        End If
 
-        If ds.Tables("checkCat").Rows.Count > 0 Then
+        ' Check if category already exists
+        If CInt(GetValue("SELECT COUNT(*) FROM tblproductcategories WHERE name = @n", P("@n", categoryName))) > 0 Then
             MsgBox("Category name already exists.", MsgBoxStyle.Exclamation)
             Exit Sub
         End If
 
         ' Insert new category
-        Dim sql As String = "INSERT INTO tblproductcategories (name) VALUES ('" & categoryName.Replace("'", "''") & "')"
-        SetQuery(sql)
-        MsgBox("Category added successfully.", MsgBoxStyle.Information)
+        If Not SetQuery("INSERT INTO tblproductcategories (name) VALUES (@n)", P("@n", categoryName)) Then Exit Sub
 
-        Dim getIdSql As String = "SELECT LAST_INSERT_ID() AS lastid"
-        GetQuery(getIdSql, "newCat")
-        Dim newCatID As Integer = 0
-        If ds.Tables("newCat").Rows.Count > 0 Then
-            newCatID = CInt(ds.Tables("newCat").Rows(0)("lastid"))
-        End If
-        LogActivity("Categories", "Add Category", newCatID)
+        LogActivity("Categories", "Add Category", GetLastInsertedID())
+        MsgBox("Category added successfully.", MsgBoxStyle.Information)
 
         Me.DialogResult = DialogResult.OK
         Me.Close()

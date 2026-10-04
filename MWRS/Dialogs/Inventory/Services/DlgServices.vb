@@ -10,10 +10,10 @@
         Dim sql As String = "SELECT serviceid, name, price, status FROM tblservices"
 
         If keyword <> "" Then
-            sql &= " WHERE name LIKE '%" & keyword.Replace("'", "''") & "%'"
+            sql &= " WHERE name LIKE @k"
         End If
 
-        GetQuery(sql, "tblservices")
+        GetQuery(sql, "tblservices", P("@k", "%" & keyword & "%"))
 
         For Each row As DataRow In ds.Tables("tblservices").Rows
             Dim item As New ListViewItem(row("serviceid").ToString())
@@ -68,10 +68,23 @@
         Dim id As Integer = CInt(lvservices.SelectedItems(0).Text)
         Dim name As String = lvservices.SelectedItems(0).SubItems(1).Text
 
+        ' Orders keep a link to the services they used, so those can't be deleted.
+        Dim used As Integer = CInt(GetValue("SELECT COUNT(*) FROM tblorderitems WHERE serviceid = @s", P("@s", id)))
+        If used > 0 Then
+            If MsgBox("'" & name & "' is used in " & used & " order item(s) and can't be deleted." & vbCrLf &
+                      "Would you like to set its status to Inactive instead?", MsgBoxStyle.YesNo + MsgBoxStyle.Exclamation, "Cannot Delete") = MsgBoxResult.Yes Then
+                If SetQuery("UPDATE tblservices SET status = 'Inactive' WHERE serviceid = @s", P("@s", id)) Then
+                    LogActivity("Services", "Set Inactive: " & name, id)
+                    LoadServices()
+                End If
+            End If
+            Exit Sub
+        End If
+
         If MsgBox("Are you sure you want to delete '" & name & "'?", MsgBoxStyle.YesNo + MsgBoxStyle.Question) = MsgBoxResult.Yes Then
-            Dim sql As String = "DELETE FROM tblservices WHERE serviceid = " & id
-            SetQuery(sql)
-            LogActivity("Services", "Deleted service: " & name, id)
+            If SetQuery("DELETE FROM tblservices WHERE serviceid = @s", P("@s", id)) Then
+                LogActivity("Services", "Deleted service: " & name, id)
+            End If
             LoadServices()
         End If
     End Sub

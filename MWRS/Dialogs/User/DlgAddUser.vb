@@ -6,42 +6,47 @@
     End Sub
 
     Private Sub btnsave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnsave.Click
+        Dim fname As String = txtfname.Text.Trim()
+        Dim lname As String = txtlname.Text.Trim()
+        Dim username As String = txtusername.Text.Trim()
+        Dim password As String = txtpassword.Text.Trim()
+
         ' Basic validation
-        If txtfname.Text.Trim() = "" OrElse txtlname.Text.Trim() = "" OrElse
-           txtusername.Text.Trim() = "" OrElse txtpassword.Text.Trim() = "" Then
+        If fname = "" OrElse lname = "" OrElse username = "" OrElse password = "" Then
             MsgBox("Please fill in all required fields.", MsgBoxStyle.Exclamation)
             Exit Sub
         End If
 
-        ' Check if username already exists
-        Dim checkSql As String = "SELECT COUNT(*) AS total FROM tblusers WHERE username = '" & txtusername.Text.Replace("'", "''") & "'"
-        GetQuery(checkSql, "checkuser")
+        If fname.Length > 50 OrElse lname.Length > 50 OrElse username.Length > 50 Then
+            MsgBox("Names and username can be at most 50 characters.", MsgBoxStyle.Exclamation)
+            Exit Sub
+        End If
 
-        If ds.Tables("checkuser").Rows(0)("total") > 0 Then
+        If cmbrole.SelectedIndex = -1 OrElse cmbstatus.SelectedIndex = -1 Then
+            MsgBox("Please select a role and a status.", MsgBoxStyle.Exclamation)
+            Exit Sub
+        End If
+
+        If password.Length < MinPasswordLength Then
+            MsgBox("Password must be at least " & MinPasswordLength & " characters.", MsgBoxStyle.Exclamation)
+            txtpassword.Focus()
+            Exit Sub
+        End If
+
+        ' Check if username already exists
+        If CInt(GetValue("SELECT COUNT(*) FROM tblusers WHERE username = @u", P("@u", username))) > 0 Then
             MsgBox("Username already exists. Choose a different one.", MsgBoxStyle.Exclamation)
             Exit Sub
         End If
 
-
-        ' Build insert query
-        Dim sql As String =
-            "INSERT INTO tblusers (fname, lname, username, password, role, status) VALUES (" &
-            "'" & txtfname.Text.Replace("'", "''") & "', " &
-            "'" & txtlname.Text.Replace("'", "''") & "', " &
-            "'" & txtusername.Text.Replace("'", "''") & "', " &
-            "'" & txtpassword.Text.Replace("'", "''") & "', " &
-            "'" & cmbrole.Text.Replace("'", "''") & "', " &
-            "'" & cmbstatus.Text.Replace("'", "''") & "')"
-
-        ' Execute query
-        SetQuery(sql)
-        MsgBox("New user added successfully.", MsgBoxStyle.Information)
+        ' Only a salted hash of the password is stored.
+        If Not SetQuery("INSERT INTO tblusers (fname, lname, username, password, role, status) VALUES (@f, @l, @u, @p, @r, @s)",
+                        P("@f", fname), P("@l", lname), P("@u", username), P("@p", HashPassword(password)),
+                        P("@r", cmbrole.Text), P("@s", cmbstatus.Text)) Then Exit Sub
 
         ' --- Log Activity ---
-        Dim getNewIdSql As String = "SELECT MAX(userid) AS newID FROM tblusers"
-        GetQuery(getNewIdSql, "newuser")
-        Dim newID As Integer = CInt(ds.Tables("newuser").Rows(0)("newID"))
-        LogActivity("User", "Add user", newID)
+        LogActivity("User", "Add user", GetLastInsertedID())
+        MsgBox("New user added successfully.", MsgBoxStyle.Information)
 
         ' Close dialog
         Me.DialogResult = DialogResult.OK
@@ -65,10 +70,6 @@
         cmbstatus.Items.Clear()
         cmbstatus.Items.AddRange(New String() {"Active", "Inactive"})
         cmbstatus.DropDownStyle = ComboBoxStyle.DropDownList
-
-        ' Set default selections
-        If cmbrole.Items.Count > 0 Then cmbrole.SelectedIndex = 0
-        If cmbstatus.Items.Count > 0 Then cmbstatus.SelectedIndex = 0
     End Sub
 
     Private Sub Clear()
@@ -76,8 +77,10 @@
         txtlname.Clear()
         txtpassword.Clear()
         txtusername.Clear()
-        cmbrole.SelectedIndex = -1
-        cmbstatus.SelectedIndex = -1
+
+        ' New accounts start as active employees; Admin has to be chosen on purpose.
+        cmbrole.SelectedItem = "Employee"
+        cmbstatus.SelectedItem = "Active"
     End Sub
 
 End Class

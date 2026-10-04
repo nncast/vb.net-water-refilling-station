@@ -1,6 +1,6 @@
 ﻿Public Class Login
     Private Sub Login_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Connect("localhost", "dbmwrs", "3306", "root", "")
+        Connect()
     End Sub
 
     Private Sub btnLogin_Click(sender As Object, e As EventArgs) Handles btnLogin.Click
@@ -12,16 +12,11 @@
             Exit Sub
         End If
 
-        Dim sql As String =
-            "SELECT userid, username, role, status " &
-            "FROM tblusers " &
-            "WHERE username = '" & username.Replace("'", "''") & "' " &
-            "AND password = '" & password.Replace("'", "''") & "'"
+        ' Look the account up by username only; the password is checked against
+        ' its stored hash (accounts from before hashing still hold plain text).
+        GetQuery("SELECT userid, password, role, status FROM tblusers WHERE username = @u", "tblusers", P("@u", username))
 
-        ds.Tables.Clear()
-        GetQuery(sql, "tblusers")
-
-        If ds.Tables("tblusers").Rows.Count = 0 Then
+        If ds.Tables("tblusers").Rows.Count = 0 OrElse Not VerifyPassword(password, ds.Tables("tblusers").Rows(0)("password").ToString()) Then
             MsgBox("Incorrect username or password.", MsgBoxStyle.Critical, "Login Failed")
             clearfields()
             Exit Sub
@@ -40,17 +35,21 @@
             Exit Sub
         End If
 
+        ' --- Replace a plain-text password with its hash ---
+        If NeedsRehash(row("password").ToString()) Then
+            SetQuery("UPDATE tblusers SET password = @p WHERE userid = @u", P("@p", HashPassword(password)), P("@u", userid))
+        End If
+
         ' --- Save global user info ---
         Globals.UserID = userid
         Globals.UserName = username
         Globals.UserRole = role
 
         ' --- Log successful login ---
-        SetQuery("INSERT INTO tblloginlogs (userid) VALUES (" & userid & ")")
+        SetQuery("INSERT INTO tblloginlogs (userid) VALUES (@u)", P("@u", userid))
 
         ' --- Role-based redirection ---
         clearfields()
-        txtpassword.UseSystemPasswordChar = False
 
         Select Case role
             Case "Admin"
@@ -71,14 +70,18 @@
 
             Case Else
                 MsgBox("Invalid user role detected.", MsgBoxStyle.Critical, "Login Error")
+                Globals.LogOut()
                 clearfields()
         End Select
     End Sub
 
     ' --- Clear login fields ---
+    ' The password box goes back to hidden, so it isn't readable after a logout.
     Public Sub clearfields()
         txtusername.Clear()
         txtpassword.Clear()
+        txtpassword.UseSystemPasswordChar = True
+        piceyeshow.Visible = True
     End Sub
 
     ' --- Eye icon toggle ---

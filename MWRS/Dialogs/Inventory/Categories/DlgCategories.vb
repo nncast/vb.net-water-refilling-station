@@ -9,11 +9,11 @@
 
         Dim sql As String = "SELECT * FROM tblproductcategories"
         If keyword <> "" Then
-            sql &= " WHERE name LIKE '%" & keyword.Replace("'", "''") & "%'"
+            sql &= " WHERE name LIKE @k"
         End If
         sql &= " ORDER BY name"
 
-        GetQuery(sql, "tblproductcategories")
+        GetQuery(sql, "tblproductcategories", P("@k", "%" & keyword & "%"))
 
         For Each row As DataRow In ds.Tables("tblproductcategories").Rows
             Dim item As New ListViewItem(row("categoryid").ToString())
@@ -53,19 +53,14 @@
         Dim selectedId As Integer = CInt(lvcategories.SelectedItems(0).Text)
 
         ' --- Check if the category is used in tblproducts ---
-        Dim checkSql As String = "SELECT productid FROM tblproducts WHERE categoryid = " & selectedId & " LIMIT 1"
-        ds.Tables.Clear()
-        GetQuery(checkSql, "check")
-
-        If ds.Tables("check").Rows.Count > 0 Then
+        If CInt(GetValue("SELECT COUNT(*) FROM tblproducts WHERE categoryid = @c", P("@c", selectedId))) > 0 Then
             MsgBox("Cannot delete this category because it is still used by one or more products.", MsgBoxStyle.Critical, "Delete Blocked")
             Exit Sub
         End If
 
         ' --- Confirm delete ---
         If MsgBox("Are you sure you want to delete this category?", MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Confirm Deletion") = MsgBoxResult.Yes Then
-            Dim sql As String = "DELETE FROM tblproductcategories WHERE categoryid = " & selectedId
-            SetQuery(sql)
+            If Not SetQuery("DELETE FROM tblproductcategories WHERE categoryid = @c", P("@c", selectedId)) Then Exit Sub
             MsgBox("Category deleted successfully.", MsgBoxStyle.Information)
 
             LogActivity("Categories Management", "Delete Category", selectedId)

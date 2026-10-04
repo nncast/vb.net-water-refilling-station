@@ -58,9 +58,10 @@
     <Reference Include="Microsoft.VisualBasic.PowerPacks.Vs, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="MySql.Data, Version=8.0.18.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\Downloads\MySql.Data.dll</HintPath>
+      <HintPath>..\lib\MySql.Data.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.DirectoryServices" />
@@ -332,6 +333,8 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Globals.vb" />
+    <Compile Include="OrderLogic.vb" />
+    <Compile Include="PasswordHasher.vb" />
     <Compile Include="Login.Designer.vb">
       <DependentUpon>Login.vb</DependentUpon>
     </Compile>

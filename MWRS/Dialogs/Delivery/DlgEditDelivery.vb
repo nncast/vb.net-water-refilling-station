@@ -14,7 +14,7 @@
         })
 
         cmbStatus.DropDownStyle = ComboBoxStyle.DropDownList
-        cmbStatus.Text = DeliveryStatus
+        cmbStatus.SelectedIndex = cmbStatus.Items.IndexOf(DeliveryStatus)
 
         lblDeliveryID.Text = DeliveryID.ToString()
         dtpDeliveryDate.Value = DeliveryDate
@@ -48,13 +48,8 @@
         If dlg.ShowDialog() = DialogResult.OK Then
             If dlg.SelectedOrderIDs.Count > 0 Then
                 Try
-                    For Each orderID As Integer In dlg.SelectedOrderIDs
-                        ' Link the order to this delivery
-                        SetQuery("INSERT INTO tbldeliveryorders (deliveryid, orderid) VALUES (" & DeliveryID & ", " & orderID & ")")
-
-                        ' Update the order’s status
-                        SetQuery("UPDATE tblorders SET status = 'Out For Delivery' WHERE orderid = " & orderID)
-                    Next
+                    ' Each order must still be Ready To Deliver and not in another delivery.
+                    AddOrdersToDelivery(DeliveryID, dlg.SelectedOrderIDs)
 
                     MsgBox(dlg.SelectedOrderIDs.Count & " order(s) added to delivery.", MsgBoxStyle.Information)
                     LoadAssignedOrders(DeliveryID)
@@ -78,11 +73,9 @@
 
         If MsgBox("Remove this order from the delivery?", MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Confirm") = MsgBoxResult.Yes Then
             Try
-                ' --- Delete link ---
-                SetQuery("DELETE FROM tbldeliveryorders WHERE deliveryid = " & DeliveryID & " AND orderid = " & orderID)
-
-                ' --- Reset order status ---
-                SetQuery("UPDATE tblorders SET status = 'Ready To Deliver' WHERE orderid = " & orderID)
+                ' Only an order that is still Out For Delivery goes back to Ready To Deliver;
+                ' completed or cancelled orders keep their status.
+                RemoveOrderFromDelivery(DeliveryID, orderID)
 
                 MsgBox("Order removed and reverted to 'Ready To Deliver'.", MsgBoxStyle.Information)
                 LoadAssignedOrders(DeliveryID)
@@ -102,11 +95,11 @@
                 "LEFT JOIN tblorders o ON do.orderid = o.orderid " &
                 "LEFT JOIN tblcustomers c ON o.custid = c.custid " &
                 "LEFT JOIN tblorderitems oi ON o.orderid = oi.orderid " &
-                "WHERE do.deliveryid = " & deliveryID & " " &
+                "WHERE do.deliveryid = @d " &
                 "GROUP BY o.orderid, c.fullname, o.status"
 
 
-            GetQuery(sql, "assignedorders")
+            GetQuery(sql, "assignedorders", P("@d", deliveryID))
 
             lvAssignedOrders.Items.Clear()
             For Each row As DataRow In ds.Tables("assignedorders").Rows
@@ -133,8 +126,7 @@
             If lvAssignedOrders.Items.Count = 0 Then
                 ' No orders, delete the delivery record
                 If MsgBox("No orders assigned to this delivery. Delete the delivery record?", MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Confirm Delete") = MsgBoxResult.Yes Then
-                    SetQuery("DELETE FROM tbldelivery WHERE deliveryid = " & DeliveryID)
-                    LogActivity("Delivery", "Deleted Delivery #" & DeliveryID & " because it had no assigned orders.", DeliveryID)
+                    DeleteDelivery(DeliveryID)
                     MsgBox("Delivery deleted successfully.", MsgBoxStyle.Information)
                     Me.DialogResult = DialogResult.OK
                     Me.Close()
@@ -142,34 +134,21 @@
                 Exit Sub
             End If
 
-            Dim newDate As String = dtpDeliveryDate.Value.ToString("yyyy-MM-dd HH:mm:ss")
-            Dim newUserID As Integer = CInt(cmbDeliveryPerson.SelectedValue)
-            Dim newStatus As String = cmbStatus.Text.Trim()
+            ' --- Validate status ---
+            If cmbStatus.SelectedIndex = -1 Then
+                MsgBox("Please select a delivery status.", MsgBoxStyle.Exclamation)
+                Exit Sub
+            End If
 
-            ' --- Update delivery info ---
-            SetQuery("UPDATE tbldelivery SET userid = " & newUserID & ", deliverydate = '" & newDate & "' WHERE deliveryid = " & DeliveryID)
+            ' Delivered completes the orders that are still on the road; Cancelled
+            ' sends them back to Ready To Deliver and removes them from this delivery.
+            Dim deleted As Boolean = UpdateDelivery(DeliveryID, CInt(cmbDeliveryPerson.SelectedValue), dtpDeliveryDate.Value, cmbStatus.Text)
 
-            ' --- Map delivery-level status to order statuses ---
-            Dim orderStatus As String = ""
-            Select Case newStatus
-                Case "Out For Delivery"
-                    orderStatus = "Out For Delivery"
-                Case "Delivered"
-                    orderStatus = "Completed"
-                Case "Cancelled"
-                    orderStatus = "Ready To Deliver"
-                Case Else
-                    orderStatus = "Ready To Deliver"
-            End Select
-
-            ' --- Update all orders tied to this delivery ---
-            SetQuery("UPDATE tblorders SET status = '" & orderStatus & "' " &
-                     "WHERE orderid IN (SELECT orderid FROM tbldeliveryorders WHERE deliveryid = " & DeliveryID & ")")
-
-            ' --- Log activity ---
-            LogActivity("Delivery", "Updated Delivery", DeliveryID)
-
-            MsgBox("Delivery and order statuses updated successfully.", MsgBoxStyle.Information)
+            If deleted Then
+                MsgBox("Delivery cancelled. Its orders are back in 'Ready To Deliver' and the empty delivery was removed.", MsgBoxStyle.Information)
+            Else
+                MsgBox("Delivery and order statuses updated successfully.", MsgBoxStyle.Information)
+            End If
             Me.DialogResult = DialogResult.OK
             Me.Close()
 

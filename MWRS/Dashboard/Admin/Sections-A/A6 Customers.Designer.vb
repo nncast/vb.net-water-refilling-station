@@ -111,7 +111,7 @@ Partial Class A6_Customer
         'cmbpurok
         '
         Me.cmbpurok.FormattingEnabled = True
-        Me.cmbpurok.Location = New System.Drawing.Point(292, 14)
+        Me.cmbpurok.Location = New System.Drawing.Point(278, 14)
         Me.cmbpurok.Name = "cmbpurok"
         Me.cmbpurok.Size = New System.Drawing.Size(132, 36)
         Me.cmbpurok.TabIndex = 12
@@ -119,7 +119,7 @@ Partial Class A6_Customer
         'cmbbarangay
         '
         Me.cmbbarangay.FormattingEnabled = True
-        Me.cmbbarangay.Location = New System.Drawing.Point(46, 14)
+        Me.cmbbarangay.Location = New System.Drawing.Point(34, 14)
         Me.cmbbarangay.Name = "cmbbarangay"
         Me.cmbbarangay.Size = New System.Drawing.Size(218, 36)
         Me.cmbbarangay.TabIndex = 3

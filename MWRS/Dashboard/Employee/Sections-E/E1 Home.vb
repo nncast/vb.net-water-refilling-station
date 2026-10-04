@@ -6,7 +6,8 @@
 
     Public Sub LoadDashboardData()
         ' --- Total Sales (Today) ---
-        GetQuery("SELECT IFNULL(SUM(totalamount),0) AS totalsales FROM tblsales WHERE DATE(saledate)=CURDATE()", "salesToday")
+        GetQuery("SELECT IFNULL(SUM(s.totalamount),0) AS totalsales FROM tblsales s JOIN tblorders o ON o.orderid = s.orderid " &
+                 "WHERE DATE(s.saledate)=CURDATE() AND o.status <> 'Cancelled'", "salesToday")
         lblsalestoday.Text = "₱" & Format(CDec(ds.Tables("salesToday").Rows(0)("totalsales")), "0.00")
 
         ' --- Unpaid Orders ---
@@ -15,7 +16,8 @@
             "FROM tblsales s " &
             "LEFT JOIN (SELECT saleid, SUM(amountpaid) AS totalpaid FROM tblpayments GROUP BY saleid) p " &
             "ON s.saleid = p.saleid " &
-            "WHERE s.paymentstatus IN ('Unpaid','Partial')"
+            "JOIN tblorders o ON o.orderid = s.orderid " &
+            "WHERE s.paymentstatus IN ('Unpaid','Partial') AND o.status <> 'Cancelled'"
         GetQuery(sqlUnpaid, "unpaidTotal")
         lblunpaidorders.Text = "₱" & Format(CDec(ds.Tables("unpaidTotal").Rows(0)("unpaidtotal")), "0.00")
 

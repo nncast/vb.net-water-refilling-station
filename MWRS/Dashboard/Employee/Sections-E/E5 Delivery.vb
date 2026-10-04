@@ -41,11 +41,11 @@
             "LEFT JOIN tblorderitems oi ON o.orderid = oi.orderid " &
             "LEFT JOIN tblcustomerbalance cb ON o.custid = cb.custid " &
             "WHERE o.status = 'Ready To Deliver' " &
-            If(keyword <> "", " AND (c.fullname LIKE '%" & keyword & "%' OR o.orderid LIKE '%" & keyword & "%')", "") &
+            If(keyword <> "", " AND (c.fullname LIKE @k OR o.orderid LIKE @k)", "") &
             " GROUP BY o.orderid, c.fullname, b.barangayname, p.purokname, cb.balance, o.orderdate " &
             " ORDER BY o.orderdate ASC"
 
-        GetQuery(sql, "readyorders")
+        GetQuery(sql, "readyorders", P("@k", "%" & keyword & "%"))
 
         If ds.Tables("readyorders").Rows.Count > 0 Then
             For Each row As DataRow In ds.Tables("readyorders").Rows
@@ -87,48 +87,41 @@
         End If
 
         Dim deliveryUserID As Integer = CInt(cmbDeliveryPerson.SelectedValue)
-        Dim deliveryDate As String = dtpDeliveryDate.Value.ToString("yyyy-MM-dd HH:mm:ss")
 
         Try
-            ' --- Create new delivery record ---
-            SetQuery("INSERT INTO tbldelivery (userid, deliverydate) VALUES (" & deliveryUserID & ", '" & deliveryDate & "')")
-            Dim deliveryID As Integer = GetLastInsertedID()
-
-            If deliveryID <= 0 Then
-                MsgBox("Failed to create delivery record.", MsgBoxStyle.Critical, "Error")
-                Exit Sub
-            End If
-
-            ' --- Loop through selected orders ---
+            ' --- Keep only orders that are still ready and not in another delivery ---
+            Dim orderIDs As New List(Of Integer)
             For Each item As ListViewItem In lvreadyorders.SelectedItems
                 Dim orderID As Integer = CInt(item.SubItems(0).Text)
 
-                ' Check if order is still ready to deliver
-                GetQuery("SELECT status FROM tblorders WHERE orderid = " & orderID, "checkorder")
-                If ds.Tables("checkorder").Rows.Count = 0 Then
+                Dim currentStatus As Object = GetValue("SELECT status FROM tblorders WHERE orderid = @o", P("@o", orderID))
+                If currentStatus Is Nothing Then
                     MsgBox("Order ID " & orderID & " not found.", MsgBoxStyle.Exclamation, "Missing Order")
                     Continue For
                 End If
 
-                Dim currentStatus As String = ds.Tables("checkorder").Rows(0)("status").ToString()
-                If currentStatus <> "Ready To Deliver" Then
-                    MsgBox("Order ID " & orderID & " is not ready to deliver (current: " & currentStatus & ").", MsgBoxStyle.Information, "Skipped")
+                If currentStatus.ToString() <> "Ready To Deliver" Then
+                    MsgBox("Order ID " & orderID & " is not ready to deliver (current: " & currentStatus.ToString() & ").", MsgBoxStyle.Information, "Skipped")
                     Continue For
                 End If
 
                 ' Prevent duplicate linking
-                GetQuery("SELECT 1 FROM tbldeliveryorders WHERE orderid = " & orderID & " LIMIT 1", "existslink")
-                If ds.Tables("existslink").Rows.Count > 0 Then
+                If CInt(GetValue("SELECT COUNT(*) FROM tbldeliveryorders WHERE orderid = @o", P("@o", orderID))) > 0 Then
                     MsgBox("Order ID " & orderID & " is already assigned to another delivery.", MsgBoxStyle.Information, "Skipped")
                     Continue For
                 End If
 
-                ' Link and update order
-                SetQuery("INSERT INTO tbldeliveryorders (deliveryid, orderid) VALUES (" & deliveryID & ", " & orderID & ")")
-                SetQuery("UPDATE tblorders SET status = 'Out For Delivery' WHERE orderid = " & orderID)
+                orderIDs.Add(orderID)
             Next
-            ' --- Log activity for delivery assignment ---
-            LogActivity("Delivery", "Assigned Delivery to orders: " & String.Join(", ", lvreadyorders.SelectedItems.Cast(Of ListViewItem).Select(Function(i) i.SubItems(0).Text)), deliveryID)
+
+            If orderIDs.Count = 0 Then
+                MsgBox("No delivery was created because none of the selected orders can be assigned.", MsgBoxStyle.Information, "Nothing Assigned")
+                FillReadyOrders()
+                Exit Sub
+            End If
+
+            ' --- Create the delivery and link the orders in one transaction ---
+            AssignDelivery(deliveryUserID, dtpDeliveryDate.Value, orderIDs)
 
             MsgBox("Delivery assigned successfully.", MsgBoxStyle.Information, "Success")
 
@@ -153,6 +146,7 @@
                 "CONCAT(u.fname, ' ', u.lname) AS deliveryperson, " &
                 "d.deliverydate, " &
                 "CASE " &
+                "   WHEN COUNT(o.orderid) = 0 THEN 'No Orders' " &
                 "   WHEN SUM(CASE WHEN o.status <> 'Completed' THEN 1 ELSE 0 END) = 0 THEN 'Delivered' " &
                 "   WHEN SUM(CASE WHEN o.status = 'Out For Delivery' THEN 1 ELSE 0 END) > 0 THEN 'Out For Delivery' " &
                 "   WHEN SUM(CASE WHEN o.status = 'Ready To Deliver' THEN 1 ELSE 0 END) > 0 THEN 'Pending' " &
@@ -164,12 +158,11 @@
                 "LEFT JOIN tbldeliveryorders do ON d.deliveryid = do.deliveryid " &
                 "LEFT JOIN tblorders o ON do.orderid = o.orderid " &
                 "WHERE 1=1 " &
-                If(keyword <> "", " AND (CONCAT(u.fname, ' ', u.lname) LIKE '%" & keyword & "%' " &
-                                   "OR d.deliveryid LIKE '%" & keyword & "%')", "") &
+                If(keyword <> "", " AND (CONCAT(u.fname, ' ', u.lname) LIKE @k OR d.deliveryid LIKE @k)", "") &
                 " GROUP BY d.deliveryid, u.fname, u.lname, d.deliverydate " &
                 "ORDER BY d.deliverydate DESC"
 
-            GetQuery(sql, "deliveries")
+            GetQuery(sql, "deliveries", P("@k", "%" & keyword & "%"))
 
             If ds.Tables("deliveries").Rows.Count > 0 Then
                 For Each row As DataRow In ds.Tables("deliveries").Rows

@@ -34,13 +34,13 @@
           ") payments ON o.orderid = payments.orderid " &
           "LEFT JOIN tblcustomerbalance cb ON o.custid = cb.custid " &
           "LEFT JOIN tblusers u ON o.userid = u.userid " &
-          "WHERE (c.fullname LIKE '%" & keyword & "%' OR o.orderid LIKE '%" & keyword & "%') " &
+          "WHERE (c.fullname LIKE @k OR o.orderid LIKE @k) " &
           "ORDER BY o.orderdate DESC, o.orderid DESC"
 
 
 
 
-        GetQuery(sql, "orders")
+        GetQuery(sql, "orders", P("@k", "%" & keyword & "%"))
 
         If ds.Tables("orders").Rows.Count > 0 Then
             For Each row As DataRow In ds.Tables("orders").Rows
@@ -187,49 +187,23 @@
         If dlg.ShowDialog() = DialogResult.OK Then
             Dim nextStatus As String = dlg.cmborderstatus.SelectedItem.ToString().Trim()
 
-            GetQuery("SELECT custid FROM tblorders WHERE orderid = " & orderId, "cust")
-            Dim custid As Integer = 0
-            If ds.Tables("cust").Rows.Count > 0 Then
-                custid = CInt(ds.Tables("cust").Rows(0)("custid"))
-            End If
-
-            If nextStatus.ToLower() = "cancelled" Then
-                GetQuery("SELECT productid, qty FROM tblorderitems WHERE orderid = " & orderId & " AND itemtype='Product'", "restoreStock")
-                For Each row As DataRow In ds.Tables("restoreStock").Rows
-                    Dim pid As Integer = CInt(row("productid"))
-                    Dim qty As Integer = CInt(row("qty"))
-
-                    SetQuery("UPDATE tblproducts SET stockqty = stockqty + " & qty & " WHERE productid = " & pid)
-
-                    SetQuery("INSERT INTO tblinventorytransactions (productid, userid, transtype, qty, remarks) " &
-                             "VALUES (" & pid & ", 1, 'Stock In', " & qty & ", 'Order Cancelled #" & orderId & "')")
-                Next
-
-                GetQuery("SELECT IFNULL(SUM(qty * price),0) AS total FROM tblorderitems WHERE orderid = " & orderId, "ordertotal")
-                Dim orderTotal As Decimal = 0
-                If ds.Tables("ordertotal").Rows.Count > 0 Then
-                    orderTotal = CDec(ds.Tables("ordertotal").Rows(0)("total"))
-                End If
-                If custid > 0 Then
-                    SetQuery("UPDATE tblcustomerbalance SET balance = balance - " & orderTotal & ", lastupdate = NOW() WHERE custid = " & custid)
-                End If
-            End If
-
-            SetQuery("UPDATE tblorders SET status = '" & nextStatus & "' WHERE orderid = " & orderId)
-
-            Dim currentUserId As Integer = 1
-            SetQuery("INSERT INTO tblactivitylogs (userid, module, action, recordid) " &
-                     "VALUES (" & currentUserId & ", 'Orders', 'Status Changed to " & nextStatus & "', " & orderId & ")")
-
-            MsgBox("Order #" & orderId & " status changed to '" & nextStatus & "'.", MsgBoxStyle.Information, "Status Updated")
+            ' Re-checks the order's current status, returns stock and updates the
+            ' balance when cancelling, takes it out of its delivery when it goes
+            ' back to Pending or is cancelled, and logs it under the current user.
+            Try
+                ChangeOrderStatus(orderId, nextStatus)
+                MsgBox("Order #" & orderId & " status changed to '" & nextStatus & "'.", MsgBoxStyle.Information, "Status Updated")
+            Catch ex As Exception
+                MsgBox("Could not change the order status: " & ex.Message, MsgBoxStyle.Critical, "Error")
+            End Try
             FillOrders()
         End If
     End Sub
 
     Private Sub btnnew_Click(sender As Object, e As EventArgs) Handles btnnew.Click
-        Globals.labelclickedA(AdminDashboard.lblsales)
-        AdminDashboard.switchPanel(E2_Sales)
-        AdminDashboard.lbltitle.Text = "Sales"
+        Globals.labelclickedE(EmployeeDashboard.lblsales)
+        EmployeeDashboard.switchPanel(E2_Sales)
+        EmployeeDashboard.lbltitle.Text = "Sales"
         E2_Sales.LoadCustomers()
         E2_Sales.LoadProducts()
         E2_Sales.LoadServices()

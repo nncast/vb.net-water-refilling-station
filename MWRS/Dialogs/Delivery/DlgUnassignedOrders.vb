@@ -22,14 +22,12 @@
             "LEFT JOIN tblorderitems oi ON o.orderid = oi.orderid " &
             "LEFT JOIN tblcustomerbalance cb ON o.custid = cb.custid " &
             "WHERE o.status = 'Ready To Deliver' " &
-            If(keyword <> "",
-                " AND (c.fullname LIKE '%" & keyword & "%' OR o.orderid LIKE '%" & keyword & "%')",
-                "") &
+            If(keyword <> "", " AND (c.fullname LIKE @k OR o.orderid LIKE @k)", "") &
             " GROUP BY o.orderid, c.fullname, fulladdress, cb.balance, o.orderdate " &
             " ORDER BY o.orderdate ASC"
 
 
-        GetQuery(sql, "readyorders")
+        GetQuery(sql, "readyorders", P("@k", "%" & keyword & "%"))
 
         If ds.Tables("readyorders").Rows.Count > 0 Then
             For Each row As DataRow In ds.Tables("readyorders").Rows

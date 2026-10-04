@@ -58,8 +58,7 @@
 
     ' ---------------- LOAD EXISTING PRODUCT ----------------
     Private Sub LoadProductData()
-        Dim sql As String = "SELECT * FROM tblproducts WHERE productid = " & SelectedProductID
-        GetQuery(sql, "tblproducts")
+        GetQuery("SELECT * FROM tblproducts WHERE productid = @p", "tblproducts", P("@p", SelectedProductID))
 
         If ds.Tables("tblproducts").Rows.Count = 0 Then
             MsgBox("Product record not found.", MsgBoxStyle.Critical, "Error")
@@ -72,23 +71,55 @@
         cmbcategory.SelectedValue = row("categoryid")
         txtprice.Text = Format(CDec(row("unitprice")), "0.00")
         cmbunit.SelectedValue = row("unitid") ' uses database ID instead of text
-        nudreorderlevel.Value = CInt(row("reorderlevel"))
+
+        ' Products saved elsewhere may have a reorder level outside this box's range
+        ' (the database default is 0); setting it as-is would throw.
+        Dim reorder As Decimal = CDec(row("reorderlevel"))
+        nudreorderlevel.Value = Math.Min(Math.Max(reorder, nudreorderlevel.Minimum), nudreorderlevel.Maximum)
         cmbstatus.Text = row("status").ToString()
     End Sub
 
     ' ---------------- UPDATE PRODUCT ----------------
     Private Sub btnupdate_Click(sender As Object, e As EventArgs) Handles btnupdate.Click
-        Dim sql As String =
-            "UPDATE tblproducts SET " &
-            "name = '" & txtproductname.Text.Replace("'", "''") & "', " &
-            "categoryid = " & cmbcategory.SelectedValue & ", " &
-            "unitprice = " & Val(txtprice.Text) & ", " &
-            "unitid = " & cmbunit.SelectedValue & ", " &
-            "reorderlevel = " & nudreorderlevel.Value & ", " &
-            "status = '" & cmbstatus.Text & "' " &
-            "WHERE productid = " & SelectedProductID
+        Dim name As String = txtproductname.Text.Trim()
+        If name = "" Then
+            MsgBox("Product name is required.", MsgBoxStyle.Exclamation)
+            txtproductname.Focus()
+            Exit Sub
+        End If
 
-        SetQuery(sql)
+        If name.Length > 100 Then
+            MsgBox("Product name can be at most 100 characters.", MsgBoxStyle.Exclamation)
+            txtproductname.Focus()
+            Exit Sub
+        End If
+
+        If cmbcategory.SelectedIndex = -1 OrElse cmbunit.SelectedIndex = -1 OrElse cmbstatus.SelectedIndex = -1 Then
+            MsgBox("Please select a category, unit and status.", MsgBoxStyle.Exclamation)
+            Exit Sub
+        End If
+
+        ' Val() read "1,200.00" as 1; TryParse reads the whole amount or rejects it.
+        Dim price As Decimal
+        If Not Decimal.TryParse(txtprice.Text.Trim(), price) OrElse price < 0 Then
+            MsgBox("Enter a valid price.", MsgBoxStyle.Exclamation)
+            txtprice.Focus()
+            Exit Sub
+        End If
+
+        If CInt(GetValue("SELECT COUNT(*) FROM tblproducts WHERE name = @n AND productid <> @p", P("@n", name), P("@p", SelectedProductID))) > 0 Then
+            MsgBox("Another product already has this name.", MsgBoxStyle.Exclamation)
+            txtproductname.Focus()
+            Exit Sub
+        End If
+
+        Dim sql As String =
+            "UPDATE tblproducts SET name = @n, categoryid = @c, unitprice = @price, unitid = @u, reorderlevel = @r, status = @s " &
+            "WHERE productid = @p"
+
+        If Not SetQuery(sql, P("@n", name), P("@c", cmbcategory.SelectedValue), P("@price", price), P("@u", cmbunit.SelectedValue),
+                        P("@r", CInt(nudreorderlevel.Value)), P("@s", cmbstatus.Text), P("@p", SelectedProductID)) Then Exit Sub
+
         LogActivity("Products", "Update product", SelectedProductID)
         MsgBox("Product updated successfully.", MsgBoxStyle.Information, "Update Successful")
         Me.DialogResult = DialogResult.OK

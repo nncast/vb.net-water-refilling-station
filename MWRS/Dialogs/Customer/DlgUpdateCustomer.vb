@@ -44,10 +44,12 @@
         cmbBarangay.SelectedIndex = -1
     End Sub
 
-    Private Function GetDataTable(sql As String) As DataTable
+    Private Function GetDataTable(sql As String, ParamArray params() As MySqlParameter) As DataTable
         Dim tableName As String = "tmp_" & Guid.NewGuid().ToString("N")
-        GetQuery(sql, tableName)
-        Return ds.Tables(tableName).Copy()
+        GetQuery(sql, tableName, params)
+        Dim copy As DataTable = ds.Tables(tableName).Copy()
+        ds.Tables.Remove(tableName)
+        Return copy
     End Function
 
 
@@ -63,7 +65,7 @@
         End If
 
         Dim dt As DataTable = GetDataTable(
-            "SELECT purokid, purokname FROM tblpuroks WHERE barangayid = " & barangayId & " ORDER BY purokname"
+            "SELECT purokid, purokname FROM tblpuroks WHERE barangayid = @b ORDER BY purokname", P("@b", barangayId)
         )
 
         cmbPurok.DataSource = dt
@@ -83,8 +85,8 @@
     ' Load Customer Details
     ' ==========================================================
     Private Sub LoadCustomerData()
-        Dim sql As String = "SELECT * FROM tblcustomers WHERE custid = " & SelectedCustID
-        GetQuery(sql, "custinfo")
+        Dim sql As String = "SELECT * FROM tblcustomers WHERE custid = @c"
+        GetQuery(sql, "custinfo", P("@c", SelectedCustID))
 
         If Not ds.Tables.Contains("custinfo") OrElse ds.Tables("custinfo").Rows.Count = 0 Then
             MsgBox("Customer record not found.", MsgBoxStyle.Critical)
@@ -100,8 +102,9 @@
         txtnotes.Text = row("notes").ToString()
 
         ' Load barangay + purok selection
-        Dim barangayId As Integer = Val(row("barangayid"))
-        Dim purokId As Integer = Val(row("purokid"))
+        ' Customers saved without an address have NULL here.
+        Dim barangayId As Integer = If(IsDBNull(row("barangayid")), 0, CInt(row("barangayid")))
+        Dim purokId As Integer = If(IsDBNull(row("purokid")), 0, CInt(row("purokid")))
 
         If barangayId > 0 Then
             cmbBarangay.SelectedValue = barangayId
@@ -118,6 +121,12 @@
         Try
             If String.IsNullOrWhiteSpace(txtfullname.Text) Then
                 MsgBox("Full name is required.", MsgBoxStyle.Exclamation)
+                txtfullname.Focus()
+                Return False
+            End If
+
+            If txtfullname.Text.Trim().Length > 150 Then
+                MsgBox("Full name can be at most 150 characters.", MsgBoxStyle.Exclamation)
                 txtfullname.Focus()
                 Return False
             End If
@@ -158,22 +167,13 @@
         Try
             If Not ValidateFields() Then Exit Sub
 
-            Dim fullname As String = txtFullname.Text.Replace("'", "''")
-            Dim barangayId As Integer = GetSafeValue(cmbBarangay)
-            Dim purokId As Integer = GetSafeValue(cmbPurok)
-            Dim contact As String = txtnumber.Text.Replace("'", "''")
-            Dim notes As String = txtnotes.Text.Replace("'", "''")
-
             Dim sql As String =
                 "UPDATE tblcustomers SET " &
-                "fullname = '" & fullname & "', " &
-                "contact = '" & contact & "', " &
-                "notes = '" & notes & "', " &
-                "barangayid = " & barangayId & ", " &
-                "purokid = " & purokId & " " &
-                "WHERE custid = " & SelectedCustID
+                "fullname = @n, contact = @c, notes = @notes, barangayid = @b, purokid = @p " &
+                "WHERE custid = @id"
 
-            SetQuery(sql)
+            If Not SetQuery(sql, P("@n", txtFullname.Text.Trim()), P("@c", txtnumber.Text.Trim()), P("@notes", txtnotes.Text.Trim()),
+                            P("@b", GetSafeValue(cmbBarangay)), P("@p", GetSafeValue(cmbPurok)), P("@id", SelectedCustID)) Then Exit Sub
 
             LogActivity("Customer", "Updated customer information", SelectedCustID)
 

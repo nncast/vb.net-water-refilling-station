@@ -11,11 +11,15 @@
     Private Sub DlgAddOrderItem_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         lblProductName.Text = PName
 
-        ' StockQty is already the "true available stock" passed from the parent
-        nudqty.Maximum = StockQty
+        ' StockQty is already the "true available stock" passed from the parent.
+        ' The range never collapses below 1, and the starting value is kept inside
+        ' it (setting a value outside the range throws).
+        nudqty.Minimum = 1
+        nudqty.Maximum = Math.Max(1, StockQty)
 
         ' Prefill quantity
-        nudqty.Value = If(CurrentCartQty > 0, CurrentCartQty, 1)
+        Dim wanted As Decimal = If(CurrentCartQty > 0, CurrentCartQty, 1)
+        nudqty.Value = Math.Min(Math.Max(wanted, nudqty.Minimum), nudqty.Maximum)
 
         lblAvailableStock.Text = "Available: " & StockQty
         lblPrice.Text = UnitPrice.ToString("F2")
@@ -23,6 +27,11 @@
     End Sub
 
     Private Sub btnsave_Click(sender As Object, e As EventArgs) Handles btnsave.Click
+        If nudqty.Value > StockQty Then
+            MsgBox("Only " & Math.Max(0, StockQty) & " in stock for " & PName & ".", MsgBoxStyle.Exclamation, "Stock Limit")
+            Exit Sub
+        End If
+
         DialogResult = DialogResult.OK
         Close()
     End Sub

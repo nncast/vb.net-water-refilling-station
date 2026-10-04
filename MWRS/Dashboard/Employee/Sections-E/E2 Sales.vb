@@ -101,10 +101,14 @@
 
     Private Function GetAvailableStock(productId As Integer, Optional excludeRow As ListViewItem = Nothing) As Integer
         ' Get total stock from DB
-        GetQuery("SELECT stockqty FROM tblproducts WHERE productid = " & productId, "productstock")
         Dim totalStock As Integer = 0
-        If ds.Tables("productstock").Rows.Count > 0 Then
-            totalStock = CInt(ds.Tables("productstock").Rows(0)("stockqty"))
+        Dim value As Object = GetValue("SELECT stockqty FROM tblproducts WHERE productid = @p", P("@p", productId))
+        If value IsNot Nothing Then totalStock = CInt(value)
+
+        ' While editing an order, the quantity it already saved is still taken out of stock.
+        If IsUpdateMode AndAlso CurrentOrderID > 0 Then
+            totalStock += CInt(GetValue("SELECT IFNULL(SUM(qty), 0) FROM tblorderitems WHERE orderid = @o AND productid = @p AND itemtype = 'Product'",
+                                        P("@o", CurrentOrderID), P("@p", productId)))
         End If
 
         ' Subtract qty already in cart (excluding current row if editing)
@@ -142,99 +146,12 @@
                 Exit Sub
             End If
 
-            ' --- Extract order info ---
-            Dim custid As Integer = CInt(cmbcustomer.SelectedValue)
-            Dim ordertype As String = cmbordertype.Text
-            Dim userid As Integer = 1 ' Replace with actual logged-in user ID
-            Dim orderTotal As Decimal = CDec(lbltotalprice.Text)
-            Dim paymentStatus As String = "Unpaid"
-
-            ' --- Insert Order Header ---
-            Dim sqlOrder As String =
-                "INSERT INTO tblorders (custid, userid, ordertype, status) " &
-                "VALUES (" & custid & ", " & userid & ", '" & ordertype & "', 'Pending')"
-            SetQuery(sqlOrder)
-
-            ' --- Get new OrderID ---
-            GetQuery("SELECT LAST_INSERT_ID() AS neworderid", "newid")
-            Dim newOrderID As Integer = CInt(ds.Tables("newid").Rows(0)("neworderid"))
-
-            ' --- Insert Order Items ---
-            For Each item As ListViewItem In lvorderitems.Items
-                Dim itemType As String = item.SubItems(7).Text
-                Dim qty As Integer = CInt(item.SubItems(2).Text)
-                Dim price As Decimal = CDec(item.SubItems(3).Text)
-                Dim sqlItem As String = ""
-
-                If itemType = "Product" Then
-                    Dim productid As Integer = CInt(item.SubItems(6).Text)
-                    sqlItem = "INSERT INTO tblorderitems (orderid, productid, qty, price, itemtype) " &
-                              "VALUES (" & newOrderID & ", " & productid & ", " & qty & ", " & price & ", 'Product')"
-                    SetQuery(sqlItem)
-
-                    ' Deduct stock
-                    SetQuery("UPDATE tblproducts SET stockqty = stockqty - " & qty & " WHERE productid = " & productid)
-
-                    ' Log inventory transaction
-                    SetQuery("INSERT INTO tblinventorytransactions (productid, userid, transtype, qty, remarks) " &
-                             "VALUES (" & productid & ", " & userid & ", 'Stock Out', " & qty & ", 'Order #" & newOrderID & "')")
-                ElseIf itemType = "Service" Then
-                    Dim serviceid As Integer = CInt(item.SubItems(6).Text)
-                    sqlItem = "INSERT INTO tblorderitems (orderid, serviceid, qty, price, itemtype) " &
-                              "VALUES (" & newOrderID & ", " & serviceid & ", " & qty & ", " & price & ", 'Service')"
-                    SetQuery(sqlItem)
-                    ' No stock deduction for services
-                End If
-            Next
-
-            ' --- Insert into tblsales and get SaleID ---
-            Dim sqlSale As String =
-                "INSERT INTO tblsales (orderid, custid, userid, totalamount, paymentstatus) " &
-                "VALUES (" & newOrderID & ", " & custid & ", " & userid & ", " & orderTotal & ", '" & paymentStatus & "')"
-            SetQuery(sqlSale)
-
-            ' --- Get new SaleID correctly ---
-            GetQuery("SELECT LAST_INSERT_ID() AS newsaleid", "newsale")
-            Dim newSaleID As Integer = CInt(ds.Tables("newsale").Rows(0)("newsaleid"))
-
-            ' --- Get current customer balance ---
-            GetQuery("SELECT balance FROM tblcustomerbalance WHERE custid = " & custid, "custbal")
-            Dim currentBalance As Decimal = 0
-            If ds.Tables("custbal").Rows.Count > 0 Then
-                currentBalance = CDec(ds.Tables("custbal").Rows(0)("balance"))
-                ' Update balance with order total
-                SetQuery("UPDATE tblcustomerbalance SET balance = balance + " & orderTotal & ", lastupdate = NOW() WHERE custid = " & custid)
-            Else
-                ' Insert new balance record
-                SetQuery("INSERT INTO tblcustomerbalance (custid, balance, lastupdate) VALUES (" & custid & ", " & orderTotal & ", NOW())")
-            End If
-
-            ' --- Log customer transaction for sale ---
-            SetQuery("INSERT INTO tblcustomertransactions (custid, saleid, amount, type) " &
-                     "VALUES (" & custid & ", " & newSaleID & ", " & orderTotal & ", 'Sale')")
-
-            ' --- Apply negative balance automatically ---
-            Dim paymentToApply As Decimal = 0
-            If currentBalance < 0 Then
-                paymentToApply = Math.Min(-currentBalance, orderTotal)
-
-                ' Insert into tblpayments
-                SetQuery("INSERT INTO tblpayments (saleid, amountpaid, paymentdate) VALUES (" & newSaleID & ", " & paymentToApply & ", NOW())")
-                SetQuery("INSERT INTO tblcustomertransactions (custid, saleid, amount, type) VALUES (" & custid & ", " & newSaleID & ", " & paymentToApply & ", 'Payment')")
-
-                ' Update customer balance after payment
-                Dim newBalance As Decimal = orderTotal - paymentToApply
-                SetQuery("UPDATE tblcustomerbalance SET balance = " & newBalance & ", lastupdate = NOW() WHERE custid = " & custid)
-
-                ' Update sale payment status
-                Dim newStatus As String = If(paymentToApply >= orderTotal, "Full", "Partial")
-                SetQuery("UPDATE tblsales SET paymentstatus = '" & newStatus & "' WHERE saleid = " & newSaleID)
-            End If
-
-            LogActivity("Sales", "Created Order", newSaleID)
+            ' Saves the order, its items, stock, sale and customer balance in one
+            ' transaction, recorded under the logged-in user.
+            Dim ids As Integer() = CreateOrder(CInt(cmbcustomer.SelectedValue), cmbordertype.Text, ReadCart(lvorderitems))
 
             ' --- Feedback & reset form ---
-            MsgBox("Order and sale recorded successfully! Order #" & newOrderID & " / Sale #" & newSaleID, MsgBoxStyle.Information, "Success")
+            MsgBox("Order and sale recorded successfully! Order #" & ids(0) & " / Sale #" & ids(1), MsgBoxStyle.Information, "Success")
 
             lvorderitems.Items.Clear()
             lbltotalprice.Text = "0.00"
@@ -375,13 +292,6 @@
                 dlg.PName = row.SubItems(1).Text
                 dlg.UnitPrice = CDec(row.SubItems(3).Text)
 
-                ' Get current DB stock
-                GetQuery("SELECT stockqty FROM tblproducts WHERE productid = " & dlg.ProductID, "productstock")
-                Dim totalStock As Integer = 0
-                If ds.Tables("productstock").Rows.Count > 0 Then
-                    totalStock = CInt(ds.Tables("productstock").Rows(0)("stockqty"))
-                End If
-
                 ' Calculate available stock excluding the current row
                 dlg.StockQty = GetAvailableStock(dlg.ProductID, row)
                 dlg.CurrentCartQty = CInt(row.SubItems(2).Text)
@@ -441,11 +351,11 @@
     Public Sub LoadExistingOrder(orderId As Integer)
         Try
             ' --- Load order header ---
-            Dim sqlOrder As String = "SELECT o.*, c.custid, CONCAT(c.fname, ' ', IFNULL(c.lname,'')) AS fullname " &
+            Dim sqlOrder As String = "SELECT o.*, c.fullname " &
                                      "FROM tblorders o " &
                                      "JOIN tblcustomers c ON o.custid = c.custid " &
-                                     "WHERE o.orderid = " & orderId
-            GetQuery(sqlOrder, "orderheader")
+                                     "WHERE o.orderid = @o"
+            GetQuery(sqlOrder, "orderheader", P("@o", orderId))
 
             If ds.Tables("orderheader").Rows.Count = 0 Then Exit Sub
             Dim row = ds.Tables("orderheader").Rows(0)
@@ -465,9 +375,9 @@
                 "FROM tblorderitems oi " &
                 "LEFT JOIN tblproducts p ON oi.productid = p.productid " &
                 "LEFT JOIN tblservices s ON oi.serviceid = s.serviceid " &
-                "WHERE oi.orderid = " & orderId
+                "WHERE oi.orderid = @o"
 
-            GetQuery(sqlItems, "orderitems")
+            GetQuery(sqlItems, "orderitems", P("@o", orderId))
 
             lvorderitems.Items.Clear()
             For Each itemRow As DataRow In ds.Tables("orderitems").Rows
@@ -565,6 +475,8 @@
 
             Case "new"
                 ' Adding new order
+                IsUpdateMode = False
+                CurrentOrderID = 0
                 cmbcustomer.Enabled = True
                 cmbordertype.Enabled = True
                 lvproducts.Enabled = True

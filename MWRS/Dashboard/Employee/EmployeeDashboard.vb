@@ -2,7 +2,7 @@
     Private ReadOnly timer As New Timer()
 
     Private Sub EmployeeDashboard_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Connect("localhost", "dbmwrs", "3306", "root", "")
+        Connect()
         switchPanel(E1_Home) ' Assuming you have an employee home form
         lbltitle.Text = "Dashboard"
 
@@ -84,23 +84,10 @@
         E6_Customer.fill()
     End Sub
 
-    ' ---------------------- LOGOUT ----------------------
-    Private Sub lbllogout_Click(sender As Object, e As EventArgs)
-        If MsgBox("Are you sure you want to log out?", MsgBoxStyle.Question + MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
-            If UserID <> 0 Then
-                SetQuery("UPDATE tblloginlogs SET logouttime = NOW() WHERE userid = " & UserID & " ORDER BY logid DESC LIMIT 1")
-            End If
-
-            UserID = 0
-            Me.Hide()
-            Login.Show()
-        End If
-    End Sub
-
     ' ---------------------- USER INFO ----------------------
     Public Sub LoadUserInfo()
         If userid > 0 Then
-            GetQuery("SELECT fname, lname FROM tblusers WHERE userid = " & userid, "tblusers")
+            GetQuery("SELECT fname, lname FROM tblusers WHERE userid = @u", "tblusers", P("@u", UserID))
 
             If ds.Tables("tblusers").Rows.Count > 0 Then
                 Dim row = ds.Tables("tblusers").Rows(0)
@@ -113,15 +100,20 @@
     End Sub
 
 
-    Private Sub lbllogout_Click_1(sender As Object, e As EventArgs) Handles lbllogout.Click
+    ' ---------------------- LOGOUT ----------------------
+    Private Sub lbllogout_Click(sender As Object, e As EventArgs) Handles lbllogout.Click
         If MsgBox("Are you sure you want to log out?", MsgBoxStyle.Question + MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
-            If UserID <> 0 Then
-                SetQuery("UPDATE tblloginlogs SET logouttime = NOW() WHERE userid = " & UserID & " ORDER BY logid DESC LIMIT 1")
-            End If
-
-            UserID = 0
+            Globals.LogOut()
             Me.Hide()
             Login.Show()
         End If
+    End Sub
+
+    ' ---------------------- CLOSING ----------------------
+    ' The login form is only hidden after signing in, so closing this window
+    ' has to end the program; otherwise it keeps running in the background.
+    Private Sub EmployeeDashboard_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
+        Globals.LogOut()
+        Application.Exit()
     End Sub
 End Class

@@ -9,6 +9,10 @@
     Public Property CustomerID As Integer
     Public Property CurrentUserID As Integer ' Logged-in user ID
 
+    ' What is still unpaid on this order. Payments are checked against this, not
+    ' against the customer's overall balance (which also covers other orders).
+    Private remaining As Decimal
+
     Private Sub DlgPayment_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ' Populate labels
         lblorderid.Text = OrderID.ToString()
@@ -18,8 +22,9 @@
         lblpaid.Text = PaidAmount.ToString("F2")
         lblbalance.Text = Balance.ToString("F2")
 
-        ' Default payment amount = remaining balance
-        txtpaymentamount.Text = (TotalAmount - PaidAmount).ToString("F2")
+        ' Default payment amount = what is left to pay on this order
+        remaining = Math.Max(0, OrderRemaining(OrderID))
+        txtpaymentamount.Text = remaining.ToString("F2")
     End Sub
 
 
@@ -39,60 +44,18 @@
             Exit Sub
         End If
 
-        If paymentAmount > Balance Then
-            MsgBox("Payment amount cannot exceed the remaining balance.", MsgBoxStyle.Exclamation, "Invalid Payment")
-            txtpaymentamount.Text = Balance.ToString("F2")
+        If paymentAmount > remaining Then
+            MsgBox("Payment amount cannot exceed the remaining balance of this order (" & remaining.ToString("F2") & ").", MsgBoxStyle.Exclamation, "Invalid Payment")
+            txtpaymentamount.Text = remaining.ToString("F2")
             txtpaymentamount.Focus()
             Exit Sub
         End If
 
-
-        ' --- 2. Get the related SALE ID for this order ---
-        Dim saleid As Integer = 0
-        GetQuery("SELECT saleid FROM tblsales WHERE orderid = " & OrderID, "saleLookup")
-
-        If ds.Tables("saleLookup").Rows.Count > 0 Then
-            saleid = CInt(ds.Tables("saleLookup").Rows(0)("saleid"))
-        Else
-            MsgBox("No sales record found for this order. Cannot proceed with payment.", MsgBoxStyle.Exclamation, "Missing Sale")
-            Exit Sub
-        End If
-
-
         Try
-            ' --- 3. Insert payment record ---
-            Dim paymentQuery As String =
-                "INSERT INTO tblpayments (saleid, amountpaid, paymentdate) " &
-                "VALUES (" & saleid & ", " & paymentAmount & ", NOW())"
-            SetQuery(paymentQuery)
-            Dim paymentID As Integer = GetLastInsertedID()
+            ' Payment, customer transaction, customer balance, the sale's payment
+            ' status and the activity log are saved together.
+            AddPayment(OrderID, paymentAmount)
 
-            ' --- 4. Record in customer transaction log ---
-            Dim txnQuery As String =
-                "INSERT INTO tblcustomertransactions (custid, saleid, amount, type, date) " &
-                "VALUES (" & Me.CustomerID & ", " & saleid & ", " & paymentAmount & ", 'Payment', NOW())"
-            SetQuery(txnQuery)
-
-            ' --- 5. Update customer balance ---
-            Dim balanceQuery As String =
-                "UPDATE tblcustomerbalance SET balance = balance - " & paymentAmount & ", lastupdate = NOW() WHERE custid = " & Me.CustomerID
-            SetQuery(balanceQuery)
-
-            ' --- 6. Update sales payment status ---
-            Dim newBalance As Decimal = Balance - paymentAmount
-            Dim status As String = If(newBalance <= 0, "Full", "Partial")
-
-            Dim saleQuery As String =
-                "UPDATE tblsales SET paymentstatus = '" & status & "' WHERE saleid = " & saleid
-            SetQuery(saleQuery)
-
-            ' --- 7. Log user activity ---
-            Dim logQuery As String =
-                "INSERT INTO tblactivitylogs (userid, module, action, recordid) " &
-                "VALUES (" & Globals.UserID & ", 'Sales', 'Payment of " & paymentAmount.ToString("F2") & " added', " & saleid & ")"
-            SetQuery(logQuery)
-
-            ' --- 8. Confirmation ---
             MsgBox("Payment of ₱" & paymentAmount.ToString("F2") & " recorded successfully.", MsgBoxStyle.Information, "Payment Success")
 
             Me.DialogResult = DialogResult.OK
@@ -110,12 +73,12 @@
     End Sub
 
 
-    ' --- Optional: Prevent user from entering more than balance ---
+    ' --- Prevent user from entering more than this order still owes ---
     Private Sub txtpaymentamount_TextChanged(sender As Object, e As EventArgs) Handles txtpaymentamount.TextChanged
         Dim value As Decimal
         If Decimal.TryParse(txtpaymentamount.Text, value) Then
-            If value > Balance Then
-                txtpaymentamount.Text = Balance.ToString("F2")
+            If value > remaining Then
+                txtpaymentamount.Text = remaining.ToString("F2")
                 txtpaymentamount.SelectionStart = txtpaymentamount.Text.Length
             End If
         End If

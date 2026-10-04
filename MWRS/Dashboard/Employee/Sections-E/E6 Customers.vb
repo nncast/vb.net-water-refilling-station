@@ -25,7 +25,6 @@
 
             If DlgUpdateCustomer.ShowDialog() = DialogResult.OK Then
                 fill()
-                LogActivity("Customer", "Updated customer information", selectedID)
             End If
         Catch ex As Exception
             MsgBox("Error editing customer: " & ex.Message, MsgBoxStyle.Critical)
@@ -61,28 +60,26 @@
 
             ' Filter barangay
             If barangayId > 0 Then
-                sql &= " AND c.barangayid=" & barangayId
+                sql &= " AND c.barangayid = @b"
             End If
 
             ' Filter purok
             If purokId > 0 Then
-                sql &= " AND c.purokid=" & purokId
+                sql &= " AND c.purokid = @p"
             End If
 
             ' Keyword filter
             If keyword <> "" Then
-                Dim k As String = keyword.Replace("'", "''")
-                sql &= " AND (c.fullname LIKE '%" & k & "%' " &
-                       "OR b.barangayname LIKE '%" & k & "%' " &
-                       "OR p.purokname LIKE '%" & k & "%' " &
-                       "OR c.contact LIKE '%" & k & "%' " &
-                       "OR c.notes LIKE '%" & k & "%')"
+                sql &= " AND (c.fullname LIKE @k " &
+                       "OR b.barangayname LIKE @k " &
+                       "OR p.purokname LIKE @k " &
+                       "OR c.contact LIKE @k " &
+                       "OR c.notes LIKE @k)"
             End If
 
             sql &= " ORDER BY c.fullname"
 
-            ds.Tables.Clear()
-            GetQuery(sql, "tblcustomers")
+            GetQuery(sql, "tblcustomers", P("@b", barangayId), P("@p", purokId), P("@k", "%" & keyword & "%"))
 
             If Not ds.Tables.Contains("tblcustomers") Then Exit Sub
 
@@ -112,7 +109,6 @@
 
             If editDlg.ShowDialog() = DialogResult.OK Then
                 fill()
-                LogActivity("Customer", "Updated customer via double-click", selectedID)
             End If
         Catch ex As Exception
             MsgBox("Error editing customer via double-click: " & ex.Message, MsgBoxStyle.Critical)
@@ -155,7 +151,7 @@
 
         ' Load real puroks
         Dim realPuroks As DataTable =
-            GetDataTable("SELECT purokid, purokname FROM tblpuroks WHERE barangayid=" & barangayId & " ORDER BY purokname")
+            GetDataTable("SELECT purokid, purokname FROM tblpuroks WHERE barangayid = @b ORDER BY purokname", P("@b", barangayId))
 
         For Each r As DataRow In realPuroks.Rows
             Dim nr As DataRow = dt.NewRow()
@@ -172,10 +168,12 @@
     End Sub
 
 
-    Private Function GetDataTable(sql As String) As DataTable
+    Private Function GetDataTable(sql As String, ParamArray params() As MySqlParameter) As DataTable
         Dim tableName As String = "tmp_" & Guid.NewGuid().ToString("N")
-        GetQuery(sql, tableName)
-        Return ds.Tables(tableName).Copy()
+        GetQuery(sql, tableName, params)
+        Dim copy As DataTable = ds.Tables(tableName).Copy()
+        ds.Tables.Remove(tableName)
+        Return copy
     End Function
     Private Sub cmbbarangay_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbbarangay.SelectedIndexChanged
         Try

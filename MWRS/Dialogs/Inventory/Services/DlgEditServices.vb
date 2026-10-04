@@ -7,8 +7,7 @@
 
     Private Sub LoadServiceDetails()
         Try
-            Dim sql As String = "SELECT * FROM tblservices WHERE serviceid = " & ServiceID
-            GetQuery(sql, "tblservices")
+            GetQuery("SELECT * FROM tblservices WHERE serviceid = @s", "tblservices", P("@s", ServiceID))
 
             If ds.Tables("tblservices").Rows.Count > 0 Then
                 Dim row As DataRow = ds.Tables("tblservices").Rows(0)
@@ -23,23 +22,41 @@
 
     Private Sub btnupdate_Click(sender As Object, e As EventArgs) Handles btnupdate.Click
         Try
-            If txtservicename.Text.Trim() = "" Or txtprice.Text.Trim() = "" Then
+            Dim name As String = txtservicename.Text.Trim()
+            Dim price As Decimal
+
+            If name = "" Or txtprice.Text.Trim() = "" Then
                 MsgBox("Please fill out all fields.", MsgBoxStyle.Exclamation)
                 Exit Sub
             End If
 
-            Dim sql As String =
-                "UPDATE tblservices SET " &
-                "name = '" & txtservicename.Text.Replace("'", "''") & "', " &
-                "price = " & CDec(txtprice.Text) & ", " &
-                "status = '" & cmbstatus.Text & "' " &
-                "WHERE serviceid = " & ServiceID
+            If name.Length > 100 Then
+                MsgBox("Service name can be at most 100 characters.", MsgBoxStyle.Exclamation)
+                Exit Sub
+            End If
 
-            SetQuery(sql)
+            If Not Decimal.TryParse(txtprice.Text.Trim(), price) OrElse price < 0 Then
+                MsgBox("Enter a valid numeric price.", MsgBoxStyle.Exclamation)
+                txtprice.Focus()
+                Exit Sub
+            End If
+
+            Dim status As String = cmbstatus.Text.Trim()
+            If status <> "Active" AndAlso status <> "Inactive" Then
+                MsgBox("Select a status (Active or Inactive).", MsgBoxStyle.Exclamation)
+                Exit Sub
+            End If
+
+            If CInt(GetValue("SELECT COUNT(*) FROM tblservices WHERE name = @n AND serviceid <> @s", P("@n", name), P("@s", ServiceID))) > 0 Then
+                MsgBox("Another service already has this name.", MsgBoxStyle.Exclamation)
+                Exit Sub
+            End If
+
+            If Not SetQuery("UPDATE tblservices SET name = @n, price = @p, status = @st WHERE serviceid = @s",
+                            P("@n", name), P("@p", price), P("@st", status), P("@s", ServiceID)) Then Exit Sub
+
+            LogActivity("Services", "Updated service: " & name, ServiceID)
             MsgBox("Service updated successfully.", MsgBoxStyle.Information)
-
-            ' Optional: Log activity
-            LogActivity("Services", "Updated service: " & txtservicename.Text, ServiceID)
 
             Me.DialogResult = DialogResult.OK
             Me.Close()

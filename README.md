@@ -17,9 +17,9 @@
   <a href="https://github.com/nncast/vb.net-water-refilling-station/releases">All releases</a>
 </p>
 
-# MonitoringSystem-MangalosWaterRefillingStation
+# Mangalos Water Refilling Station
 
-**Monitoring System: A Desktop-Based Application for Mangalos Water Refilling Station** is a desktop-based **VB.NET** application designed to automate and monitor daily operations of a water refilling business.
+**Mangalos Water Refilling Station** is a desktop-based **VB.NET** monitoring system designed to automate and monitor daily operations of a water refilling business.
 The system centralizes **sales, inventory, customer debts, and delivery records**, replacing manual logs and spreadsheets with a structured digital solution.
 
 > **Current version: v0.1.1** — security and bug-fix release: hashed passwords, parameterized queries, correct stock, balances and payments for orders, deliveries that stay in step with their orders, the connection settings in a config file, and a ready-to-run Windows build. See [Releases](https://github.com/nncast/vb.net-water-refilling-station/releases) for the release notes.
@@ -121,4 +121,4 @@ To build from source you also need *SAP Crystal Reports, developer version for M
 
 ---
 
-*Mangalos Water Refilling Station · 2025 · VB.NET · Windows Forms · .NET Framework 4.8.1 · MariaDB*
+*Mangalos Water Refilling Station · Monitoring System · 2025 · VB.NET · Windows Forms · .NET Framework 4.8.1 · MariaDB*

@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-0.1.1-4169E1?style=flat-square" alt="version">
+  <img src="https://img.shields.io/badge/version-0.1.2-4169E1?style=flat-square" alt="version">
   <img src="https://img.shields.io/badge/status-complete-4169E1?style=flat-square" alt="status">
   <img src="https://img.shields.io/badge/VB.NET-Windows_Forms-512BD4?style=flat-square&logo=dotnet&logoColor=white" alt="VB.NET">
   <img src="https://img.shields.io/badge/.NET_Framework-4.8.1-512BD4?style=flat-square&logo=dotnet&logoColor=white" alt=".NET Framework">
@@ -11,9 +11,9 @@
 </p>
 
 <p align="center">
-  <b>Download v0.1.1:</b>
-  <a href="https://github.com/nncast/vb.net-water-refilling-station/releases/download/v0.1.1/MWRS-v0.1.1-Windows.zip">Windows (.zip)</a> ·
-  <a href="https://github.com/nncast/vb.net-water-refilling-station/archive/refs/tags/v0.1.1.zip">Source (.zip)</a> |
+  <b>Download v0.1.2:</b>
+  <a href="https://github.com/nncast/vb.net-water-refilling-station/releases/download/v0.1.2/MWRS-v0.1.2-Windows.zip">Windows (.zip)</a> ·
+  <a href="https://github.com/nncast/vb.net-water-refilling-station/archive/refs/tags/v0.1.2.zip">Source (.zip)</a> |
   <a href="https://github.com/nncast/vb.net-water-refilling-station/releases">All releases</a>
 </p>
 
@@ -22,7 +22,7 @@
 **Mangalos Water Refilling Station** is a desktop-based **VB.NET** monitoring system designed to automate and monitor daily operations of a water refilling business.
 The system centralizes **sales, inventory, customer debts, and delivery records**, replacing manual logs and spreadsheets with a structured digital solution.
 
-> **Current version: v0.1.1** — security and bug-fix release: hashed passwords, parameterized queries, correct stock, balances and payments for orders, deliveries that stay in step with their orders, the connection settings in a config file, and a ready-to-run Windows build. See [Releases](https://github.com/nncast/vb.net-water-refilling-station/releases) for the release notes.
+> **Current version: v0.1.2** — documentation update; the app is unchanged from v0.1.1, the security and bug-fix release: hashed passwords, parameterized queries, correct stock, balances and payments for orders, deliveries that stay in step with their orders, the connection settings in a config file, and a ready-to-run Windows build. See [Releases](https://github.com/nncast/vb.net-water-refilling-station/releases) for the release notes.
 
 <p align="center">
   <img width="400" alt="image" src="https://github.com/user-attachments/assets/3bd57d10-0d6a-400b-9f2b-f991b359c5dc" />
@@ -84,14 +84,14 @@ The system centralizes **sales, inventory, customer debts, and delivery records*
 
 **Windows build (no Visual Studio needed)**
 
-1. Download [`MWRS-v0.1.1-Windows.zip`](https://github.com/nncast/vb.net-water-refilling-station/releases/download/v0.1.1/MWRS-v0.1.1-Windows.zip) from the [v0.1.1 release](https://github.com/nncast/vb.net-water-refilling-station/releases/tag/v0.1.1) and extract it.
+1. Download [`MWRS-v0.1.2-Windows.zip`](https://github.com/nncast/vb.net-water-refilling-station/releases/download/v0.1.2/MWRS-v0.1.2-Windows.zip) from the [v0.1.2 release](https://github.com/nncast/vb.net-water-refilling-station/releases/tag/v0.1.2) and extract it.
 2. Start MySQL (XAMPP, WAMP, or another server) and import `database/dbmwrs.sql` from the extracted folder.
 3. If your MySQL server, port, user or password differ from `localhost:3306` / `root` / no password, open `MWRS.exe.config` in Notepad and edit the `MwrsDb` connection string.
 4. Run `MWRS.exe`.
 
 **From source**
 
-1. Clone the repository, or download the [source .zip](https://github.com/nncast/vb.net-water-refilling-station/archive/refs/tags/v0.1.1.zip).
+1. Clone the repository, or download the [source .zip](https://github.com/nncast/vb.net-water-refilling-station/archive/refs/tags/v0.1.2.zip).
    ```bash
    git clone https://github.com/nncast/vb.net-water-refilling-station.git
    ```

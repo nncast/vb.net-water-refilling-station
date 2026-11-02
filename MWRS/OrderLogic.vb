@@ -79,12 +79,12 @@ Module OrderLogic
                     P("@c", custId), P("@s", saleId), P("@a", total))
 
             ' Credit the customer already has (a negative balance) pays for this sale first.
+            ' It is recorded as a payment on the sale only: no new money came in, so it is
+            ' not a customer 'Payment' transaction (DeleteOrder relies on that).
             Dim before As Decimal = CurrentBalance(custId)
             If before < 0 AndAlso total > 0 Then
                 Dim credit As Decimal = Math.Min(-before, total)
                 Execute("INSERT INTO tblpayments (saleid, amountpaid) VALUES (@s, @a)", P("@s", saleId), P("@a", credit))
-                Execute("INSERT INTO tblcustomertransactions (custid, saleid, amount, type) VALUES (@c, @s, @a, 'Payment')",
-                        P("@c", custId), P("@s", saleId), P("@a", credit))
             End If
 
             ' The credit is already part of the balance, so the balance only grows by the order total.
@@ -215,11 +215,13 @@ Module OrderLogic
                 AddToBalance(custId, -OrderTotal(orderId))
             End If
 
-            ' Its payments are deleted too, so they stop counting toward the balance.
+            ' Its payments are deleted too, so they stop counting toward the balance. Only
+            ' money actually paid (the 'Payment' transactions) lowered the balance; store
+            ' credit used on the sale didn't, and stays with the customer.
             GetQuery("SELECT saleid FROM tblsales WHERE orderid = @o", "ol_sales", P("@o", orderId))
             For Each sale As DataRow In ds.Tables("ol_sales").Rows
                 Dim saleId As Integer = CInt(sale("saleid"))
-                Dim paid As Decimal = TotalPaid(saleId)
+                Dim paid As Decimal = CDec(GetValue("SELECT IFNULL(SUM(amount), 0) FROM tblcustomertransactions WHERE saleid = @s AND type = 'Payment'", P("@s", saleId)))
                 If paid <> 0 Then AddToBalance(custId, paid)
                 Execute("DELETE FROM tblpayments WHERE saleid = @s", P("@s", saleId))
                 Execute("DELETE FROM tblcustomertransactions WHERE saleid = @s", P("@s", saleId))

@@ -121,7 +121,7 @@
                         P("@r", CInt(nudreorderlevel.Value)), P("@s", cmbstatus.Text), P("@p", SelectedProductID)) Then Exit Sub
 
         LogActivity("Products", "Update product", SelectedProductID)
-        MsgBox("Product updated successfully.", MsgBoxStyle.Information, "Update Successful")
+        Toast.Notify("Product updated successfully.")
         Me.DialogResult = DialogResult.OK
         Me.Close()
     End Sub

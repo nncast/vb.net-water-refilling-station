@@ -56,7 +56,7 @@
             ' status and the activity log are saved together.
             AddPayment(OrderID, paymentAmount)
 
-            MsgBox("Payment of ₱" & paymentAmount.ToString("F2") & " recorded successfully.", MsgBoxStyle.Information, "Payment Success")
+            Toast.Notify("Payment of ₱" & paymentAmount.ToString("F2") & " recorded successfully.")
 
             Me.DialogResult = DialogResult.OK
             Me.Close()

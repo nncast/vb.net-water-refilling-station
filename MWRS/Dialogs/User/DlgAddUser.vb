@@ -46,7 +46,7 @@
 
         ' --- Log Activity ---
         LogActivity("User", "Add user", GetLastInsertedID())
-        MsgBox("New user added successfully.", MsgBoxStyle.Information)
+        Toast.Notify("New user added successfully.")
 
         ' Close dialog
         Me.DialogResult = DialogResult.OK

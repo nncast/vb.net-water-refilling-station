@@ -142,6 +142,8 @@ Partial Class DlgAddServices
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.White
         Me.ClientSize = New System.Drawing.Size(382, 293)
+        Me.AcceptButton = Me.btnsave
+        Me.CancelButton = Me.btncancel
         Me.Controls.Add(Me.TableLayoutPanel1)
         Me.Controls.Add(Me.cmbstatus)
         Me.Controls.Add(Me.txtprice)

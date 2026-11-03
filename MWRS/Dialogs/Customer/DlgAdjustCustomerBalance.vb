@@ -61,7 +61,7 @@
 
             If Not SetQuery(sql, P("@c", SelectedCustID), P("@b", newBalance)) Then Exit Sub
             LogActivity("Customer", "Adjusted balance to: " & newBalance, SelectedCustID)
-            MsgBox("Customer balance updated successfully.", MsgBoxStyle.Information)
+            Toast.Notify("Customer balance updated successfully.")
 
             Me.DialogResult = DialogResult.OK
             Me.Close()

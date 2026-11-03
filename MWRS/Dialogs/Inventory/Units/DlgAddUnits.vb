@@ -33,7 +33,7 @@
         LogActivity("Units", "Added unit: " & unitType, GetLastInsertedID())
 
         ' Success message
-        MessageBox.Show("Unit added successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        Toast.Notify("Unit added successfully.")
 
         ' Close dialog with OK result
         Me.DialogResult = System.Windows.Forms.DialogResult.OK

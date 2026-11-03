@@ -61,7 +61,7 @@
         ' --- Confirm delete ---
         If MsgBox("Are you sure you want to delete this category?", MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Confirm Deletion") = MsgBoxResult.Yes Then
             If Not SetQuery("DELETE FROM tblproductcategories WHERE categoryid = @c", P("@c", selectedId)) Then Exit Sub
-            MsgBox("Category deleted successfully.", MsgBoxStyle.Information)
+            Toast.Notify("Category deleted successfully.")
 
             LogActivity("Categories Management", "Delete Category", selectedId)
             fill()

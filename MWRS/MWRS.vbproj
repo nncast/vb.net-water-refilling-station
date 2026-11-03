@@ -110,6 +110,7 @@
   <ItemGroup>
     <!-- Existing project files -->
     <Compile Include="Conn.vb" />
+    <Compile Include="Toast.vb" />
     <Compile Include="Dashboard\Admin\Sections-A\A3 Orders.Designer.vb">
       <DependentUpon>A3 Orders.vb</DependentUpon>
     </Compile>

@@ -109,7 +109,7 @@
 
         Dim newProductId As Integer = GetLastInsertedID()
         LogActivity("Products", "Added new product: " & txtproductname.Text.Trim(), newProductId)
-        MsgBox("Product added successfully.", MsgBoxStyle.Information)
+        Toast.Notify("Product added successfully.")
 
         Me.DialogResult = DialogResult.OK
         Me.Close()

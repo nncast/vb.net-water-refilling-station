@@ -47,7 +47,7 @@
                         P("@n", name), P("@p", price), P("@s", cmbstatus.SelectedItem.ToString())) Then Exit Sub
 
         LogActivity("Services", "Added new service: " & name, GetLastInsertedID())
-        MsgBox("Service added successfully.", MsgBoxStyle.Information)
+        Toast.Notify("Service added successfully.")
 
         Me.DialogResult = DialogResult.OK
         Me.Close()

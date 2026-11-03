@@ -22,7 +22,7 @@
         If Not SetQuery("INSERT INTO tblproductcategories (name) VALUES (@n)", P("@n", categoryName)) Then Exit Sub
 
         LogActivity("Categories", "Add Category", GetLastInsertedID())
-        MsgBox("Category added successfully.", MsgBoxStyle.Information)
+        Toast.Notify("Category added successfully.")
 
         Me.DialogResult = DialogResult.OK
         Me.Close()

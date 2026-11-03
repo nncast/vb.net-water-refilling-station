@@ -127,7 +127,7 @@
                 ' No orders, delete the delivery record
                 If MsgBox("No orders assigned to this delivery. Delete the delivery record?", MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Confirm Delete") = MsgBoxResult.Yes Then
                     DeleteDelivery(DeliveryID)
-                    MsgBox("Delivery deleted successfully.", MsgBoxStyle.Information)
+                    Toast.Notify("Delivery deleted successfully.")
                     Me.DialogResult = DialogResult.OK
                     Me.Close()
                 End If
@@ -147,7 +147,7 @@
             If deleted Then
                 MsgBox("Delivery cancelled. Its orders are back in 'Ready To Deliver' and the empty delivery was removed.", MsgBoxStyle.Information)
             Else
-                MsgBox("Delivery and order statuses updated successfully.", MsgBoxStyle.Information)
+                Toast.Notify("Delivery and order statuses updated successfully.")
             End If
             Me.DialogResult = DialogResult.OK
             Me.Close()

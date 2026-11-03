@@ -205,6 +205,8 @@ Partial Class DlgReportFilter
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.White
         Me.ClientSize = New System.Drawing.Size(455, 558)
+        Me.AcceptButton = Me.btnsave
+        Me.CancelButton = Me.btncancel
         Me.Controls.Add(Me.Label7)
         Me.Controls.Add(Me.cbEmployee)
         Me.Controls.Add(Me.Label6)

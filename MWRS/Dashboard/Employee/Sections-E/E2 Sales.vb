@@ -142,16 +142,12 @@
                 Exit Sub
             End If
 
-            If MsgBox("Do you want to save this order?", MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Confirm") = MsgBoxResult.No Then
-                Exit Sub
-            End If
-
             ' Saves the order, its items, stock, sale and customer balance in one
             ' transaction, recorded under the logged-in user.
             Dim ids As Integer() = CreateOrder(CInt(cmbcustomer.SelectedValue), cmbordertype.Text, ReadCart(lvorderitems))
 
             ' --- Feedback & reset form ---
-            MsgBox("Order and sale recorded successfully! Order #" & ids(0) & " / Sale #" & ids(1), MsgBoxStyle.Information, "Success")
+            Toast.Notify("Order #" & ids(0) & " and sale #" & ids(1) & " saved.")
 
             lvorderitems.Items.Clear()
             lbltotalprice.Text = "0.00"
@@ -184,54 +180,57 @@
             Exit Sub
         End If
 
-        ' Open dialog and pass data
-        Dim dlg As New DlgAddOrderItem()
-        dlg.ProductID = productId
-        dlg.PName = productName
-        dlg.UnitPrice = unitPrice
-        dlg.StockQty = availableStock
-        dlg.CurrentCartQty = 0       ' new addition
-        dlg.Category = category
-        dlg.Unit = unit
+        ' One double-click (or Enter) adds one; double-click the cart line to change the quantity.
+        Dim quantity As Integer = 1
+        Dim total As Decimal = quantity * unitPrice
 
-        If dlg.ShowDialog() = Windows.Forms.DialogResult.OK Then
-            Dim quantity As Integer = dlg.nudqty.Value
-            Dim total As Decimal = quantity * dlg.UnitPrice
-
-            ' Check if item already exists in cart
-            Dim existingItem As ListViewItem = Nothing
-            For Each item As ListViewItem In lvorderitems.Items
-                ' Only check products for product addition
-                If item.SubItems(7).Text = "Product" AndAlso CInt(item.SubItems(6).Text) = productId Then
-                    existingItem = item
-                    Exit For
-                End If
-            Next
-
-
-            If existingItem IsNot Nothing Then
-                ' Update existing row
-                existingItem.SubItems(2).Text = (CInt(existingItem.SubItems(2).Text) + quantity).ToString()
-                existingItem.SubItems(4).Text = (CInt(existingItem.SubItems(2).Text) * dlg.UnitPrice).ToString("F2")
-            Else
-                ' Add new row
-                Dim itemNo As Integer = lvorderitems.Items.Count + 1
-                Dim item As ListViewItem = lvorderitems.Items.Add(itemNo.ToString())  ' #
-                item.SubItems.Add(dlg.PName)                                         ' Product
-                item.SubItems.Add(quantity.ToString())                                 ' Qty
-                item.SubItems.Add(dlg.UnitPrice.ToString("F2"))                        ' Price
-                item.SubItems.Add(total.ToString("F2"))                                 ' Total
-                item.SubItems.Add("0")                                                  ' OrderID (new)
-                item.SubItems.Add(dlg.ProductID.ToString())                             ' ProductID
-                item.SubItems.Add("Product")                                            ' ItemType
-
+        ' Check if item already exists in cart
+        Dim existingItem As ListViewItem = Nothing
+        For Each item As ListViewItem In lvorderitems.Items
+            ' Only check products for product addition
+            If item.SubItems(7).Text = "Product" AndAlso CInt(item.SubItems(6).Text) = productId Then
+                existingItem = item
+                Exit For
             End If
+        Next
 
-            UpdateTotal()
+        If existingItem IsNot Nothing Then
+            ' Update existing row
+            existingItem.SubItems(2).Text = (CInt(existingItem.SubItems(2).Text) + quantity).ToString()
+            existingItem.SubItems(4).Text = (CInt(existingItem.SubItems(2).Text) * unitPrice).ToString("F2")
+        Else
+            ' Add new row
+            Dim itemNo As Integer = lvorderitems.Items.Count + 1
+            Dim item As ListViewItem = lvorderitems.Items.Add(itemNo.ToString())  ' #
+            item.SubItems.Add(productName)                                         ' Product
+            item.SubItems.Add(quantity.ToString())                                 ' Qty
+            item.SubItems.Add(unitPrice.ToString("F2"))                        ' Price
+            item.SubItems.Add(total.ToString("F2"))                                 ' Total
+            item.SubItems.Add("0")                                                  ' OrderID (new)
+            item.SubItems.Add(productId.ToString())                             ' ProductID
+            item.SubItems.Add("Product")                                            ' ItemType
+
         End If
+
+        UpdateTotal()
     End Sub
 
 
+
+    ' Enter on a product adds it, like a double-click; Delete removes the selected cart line.
+    Private Sub lvproducts_KeyDown(sender As Object, e As KeyEventArgs) Handles lvproducts.KeyDown
+        If e.KeyCode = Keys.Enter Then
+            lvproducts_DoubleClick(sender, e)
+            e.Handled = True
+        End If
+    End Sub
+
+    Private Sub lvorderitems_KeyDown(sender As Object, e As KeyEventArgs) Handles lvorderitems.KeyDown
+        If e.KeyCode = Keys.Delete AndAlso lvorderitems.SelectedItems.Count > 0 AndAlso btnremoveitem.Enabled Then
+            btnremoveitem.PerformClick()
+            e.Handled = True
+        End If
+    End Sub
 
     Private Sub UpdateTotal()
         Dim totalPrice As Decimal = 0
@@ -259,18 +258,16 @@
                 End If
             End If
 
-            Dim confirm As DialogResult = MsgBox("Are you sure you want to remove the selected item?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "Confirm Removal")
-            If confirm = DialogResult.Yes Then
-                lvorderitems.Items.Remove(itemToRemove)
-                UpdateTotal()
+            ' The cart is only saved with the order, so removing needs no confirmation.
+            lvorderitems.Items.Remove(itemToRemove)
+            UpdateTotal()
 
-                For i As Integer = 0 To lvorderitems.Items.Count - 1
-                    lvorderitems.Items(i).SubItems(0).Text = (i + 1).ToString()
-                Next
+            For i As Integer = 0 To lvorderitems.Items.Count - 1
+                lvorderitems.Items(i).SubItems(0).Text = (i + 1).ToString()
+            Next
 
-                If isDeliveryService Then
-                    cmbordertype.SelectedIndex = -1
-                End If
+            If isDeliveryService Then
+                cmbordertype.SelectedIndex = -1
             End If
 
         Catch ex As Exception

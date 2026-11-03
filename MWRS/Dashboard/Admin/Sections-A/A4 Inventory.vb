@@ -133,7 +133,7 @@
             If MsgBox("Are you sure you want to permanently delete this product?", MsgBoxStyle.YesNo + MsgBoxStyle.Question) = MsgBoxResult.Yes Then
                 If Not SetQuery("DELETE FROM tblproducts WHERE productid = @p", P("@p", productId)) Then Exit Sub
                 LogActivity("Products", "Delete product", productId)
-                MsgBox("Product deleted successfully.", MsgBoxStyle.Information)
+                Toast.Notify("Product deleted successfully.")
                 Fill()
             End If
             Exit Sub

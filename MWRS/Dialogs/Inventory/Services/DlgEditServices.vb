@@ -56,7 +56,7 @@
                             P("@n", name), P("@p", price), P("@st", status), P("@s", ServiceID)) Then Exit Sub
 
             LogActivity("Services", "Updated service: " & name, ServiceID)
-            MsgBox("Service updated successfully.", MsgBoxStyle.Information)
+            Toast.Notify("Service updated successfully.")
 
             Me.DialogResult = DialogResult.OK
             Me.Close()

@@ -28,7 +28,7 @@
         End If
 
         If Not SetQuery("UPDATE tblproductcategories SET name = @n WHERE categoryid = @c", P("@n", newName), P("@c", SelectedCategoryID)) Then Exit Sub
-        MsgBox("Category updated successfully.", MsgBoxStyle.Information)
+        Toast.Notify("Category updated successfully.")
 
         LogActivity("Categories", "Update Category", SelectedCategoryID)
 

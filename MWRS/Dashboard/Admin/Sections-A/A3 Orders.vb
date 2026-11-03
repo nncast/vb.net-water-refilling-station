@@ -136,7 +136,7 @@
             ' payments, the sale and any delivery link go with the order.
             DeleteOrder(orderId)
 
-            MsgBox("Order #" & orderId & " deleted successfully. Stock restored and records cleared.", MsgBoxStyle.Information, "Deleted")
+            Toast.Notify("Order #" & orderId & " deleted successfully. Stock restored and records cleared.")
             FillOrders()
 
         Catch ex As Exception

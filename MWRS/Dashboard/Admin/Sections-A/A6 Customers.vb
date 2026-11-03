@@ -76,7 +76,7 @@
                 Throw
             End Try
 
-            MsgBox("Customer deleted successfully.", MsgBoxStyle.Information)
+            Toast.Notify("Customer deleted successfully.")
             fill()
 
         Catch ex As Exception

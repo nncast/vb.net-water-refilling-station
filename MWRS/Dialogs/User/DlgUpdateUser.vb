@@ -81,7 +81,7 @@
 
         ' --- Log Activity ---
         LogActivity("User", "Update user", SelectedUserID)
-        MsgBox("User updated successfully.", MsgBoxStyle.Information)
+        Toast.Notify("User updated successfully.")
 
         Me.DialogResult = DialogResult.OK
         clear()

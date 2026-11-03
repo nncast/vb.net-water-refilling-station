@@ -123,7 +123,7 @@
             ' --- Create the delivery and link the orders in one transaction ---
             AssignDelivery(deliveryUserID, dtpDeliveryDate.Value, orderIDs)
 
-            MsgBox("Delivery assigned successfully.", MsgBoxStyle.Information, "Success")
+            Toast.Notify("Delivery assigned successfully.")
 
             ' --- Refresh UI ---
             FillReadyOrders()

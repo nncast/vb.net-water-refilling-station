@@ -283,6 +283,8 @@ Partial Class DlgAddress
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.White
         Me.ClientSize = New System.Drawing.Size(678, 520)
+        Me.AcceptButton = Me.btnsave
+        Me.CancelButton = Me.btncancel
         Me.Controls.Add(Me.Panel1)
         Me.Controls.Add(Me.TableLayoutPanel1)
         Me.Font = New System.Drawing.Font("Segoe UI", 10.2!)

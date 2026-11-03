@@ -255,6 +255,8 @@ Partial Class DlgPayment
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.White
         Me.ClientSize = New System.Drawing.Size(382, 453)
+        Me.AcceptButton = Me.btnsave
+        Me.CancelButton = Me.btncancel
         Me.Controls.Add(Me.lblpaid)
         Me.Controls.Add(Me.lblbalance)
         Me.Controls.Add(Me.Label8)

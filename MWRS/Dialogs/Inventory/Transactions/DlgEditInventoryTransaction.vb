@@ -135,7 +135,7 @@
             Exit Sub
         End Try
 
-        MsgBox("Transaction updated successfully.", MsgBoxStyle.Information)
+        Toast.Notify("Transaction updated successfully.")
         Me.DialogResult = DialogResult.OK
         Me.Close()
     End Sub

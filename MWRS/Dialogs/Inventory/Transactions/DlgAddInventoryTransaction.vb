@@ -106,7 +106,7 @@
             Exit Sub
         End Try
 
-        MsgBox("Transaction recorded successfully.", MsgBoxStyle.Information)
+        Toast.Notify("Transaction recorded successfully.")
 
         Me.DialogResult = DialogResult.OK
         Me.Close()

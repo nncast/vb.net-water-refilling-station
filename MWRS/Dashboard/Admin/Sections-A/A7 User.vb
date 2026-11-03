@@ -96,7 +96,7 @@
             If Not SetQuery("DELETE FROM tblusers WHERE userid = @u", P("@u", selectedID)) Then Exit Sub
             LogActivity("User", "Delete User", selectedID)
 
-            MsgBox("User deleted successfully.", MsgBoxStyle.Information)
+            Toast.Notify("User deleted successfully.")
             fill()
 
         Catch ex As Exception

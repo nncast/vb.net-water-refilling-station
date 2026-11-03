@@ -123,7 +123,7 @@
             ' --- Create the delivery and link the orders in one transaction ---
             AssignDelivery(deliveryUserID, dtpDeliveryDate.Value, orderIDs)
 
-            MsgBox("Delivery assigned successfully.", MsgBoxStyle.Information, "Success")
+            Toast.Notify("Delivery assigned successfully.")
 
             ' --- Refresh UI ---
             FillReadyOrders()
@@ -234,7 +234,7 @@
             ' pending orders are not brought back.
             DeleteDelivery(deliveryID)
 
-            MsgBox("Delivery #" & deliveryID & " deleted successfully. Orders have been reset.", MsgBoxStyle.Information, "Deleted")
+            Toast.Notify("Delivery #" & deliveryID & " deleted successfully. Orders have been reset.")
 
             ' Refresh UI
             LoadDeliveries()

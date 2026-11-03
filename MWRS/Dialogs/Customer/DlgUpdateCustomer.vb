@@ -177,7 +177,7 @@
 
             LogActivity("Customer", "Updated customer information", SelectedCustID)
 
-            MsgBox("Customer updated successfully.", MsgBoxStyle.Information)
+            Toast.Notify("Customer updated successfully.")
             Me.DialogResult = DialogResult.OK
             Me.Close()
 

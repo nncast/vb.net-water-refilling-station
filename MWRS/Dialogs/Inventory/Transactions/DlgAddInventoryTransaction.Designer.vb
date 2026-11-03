@@ -144,6 +144,7 @@ Partial Class DlgAddInventoryTransaction
         '
         Me.txtremarks.Location = New System.Drawing.Point(24, 243)
         Me.txtremarks.Multiline = True
+        Me.txtremarks.AcceptsReturn = True
         Me.txtremarks.Name = "txtremarks"
         Me.txtremarks.Size = New System.Drawing.Size(339, 111)
         Me.txtremarks.TabIndex = 3
@@ -161,6 +162,8 @@ Partial Class DlgAddInventoryTransaction
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.White
         Me.ClientSize = New System.Drawing.Size(382, 453)
+        Me.AcceptButton = Me.btnsave
+        Me.CancelButton = Me.btncancel
         Me.Controls.Add(Me.nudqty)
         Me.Controls.Add(Me.txtremarks)
         Me.Controls.Add(Me.Label4)

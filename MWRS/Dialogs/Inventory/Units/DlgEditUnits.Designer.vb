@@ -99,6 +99,8 @@ Partial Class DlgEditUnits
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.White
         Me.ClientSize = New System.Drawing.Size(332, 273)
+        Me.AcceptButton = Me.btnsave
+        Me.CancelButton = Me.btncancel
         Me.Controls.Add(Me.txtunittype)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.TableLayoutPanel1)

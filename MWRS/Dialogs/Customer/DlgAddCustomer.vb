@@ -96,7 +96,7 @@
 
             Me.NewCustID = newCustID
 
-            MsgBox("Customer added successfully.", MsgBoxStyle.Information)
+            Toast.Notify("Customer added successfully.")
             Me.DialogResult = DialogResult.OK
             Me.Close()
 
